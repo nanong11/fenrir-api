@@ -12,13 +12,13 @@ class AuthService {
   public users = userModel;
 
   public async signup(userData: CreateUserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
+    if (isEmpty(userData)) throw new HttpException(204, 'userData is empty');
 
     const findUserEmail: User = await this.users.findOne({ email: userData.email });
-    if (findUserEmail) throw new HttpException(409, `This email ${userData.email} already exists`);
+    if (findUserEmail) throw new HttpException(204, `This email ${userData.email} already exists`);
 
     const findUserMobile: User = await this.users.findOne({ mobile: userData.mobile });
-    if (findUserMobile) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
+    if (findUserMobile) throw new HttpException(204, `This mobile ${userData.mobile} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
     const createUserData: User = await this.users.create({ ...userData, password: hashedPassword });
@@ -27,14 +27,14 @@ class AuthService {
   }
 
   public async login(userData: CreateUserDto): Promise<{ cookie: string; findUser: User }> {
-    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
+    if (isEmpty(userData)) throw new HttpException(204, 'userData is empty');
 
     if (userData.mobile) {
       const findUser: User = await this.users.findOne({ mobile: userData.mobile });
-      if (!findUser) throw new HttpException(409, `This mobile ${userData.mobile} was not found`);
+      if (!findUser) throw new HttpException(204, `This mobile ${userData.mobile} was not found`);
 
       const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-      if (!isPasswordMatching) throw new HttpException(409, 'Password is not matching');
+      if (!isPasswordMatching) throw new HttpException(204, 'Password is not matching');
 
       const tokenData = this.createToken(findUser);
       const cookie = this.createCookie(tokenData);
@@ -42,10 +42,10 @@ class AuthService {
       return { cookie, findUser };
     } else {
       const findUser: User = await this.users.findOne({ email: userData.email });
-      if (!findUser) throw new HttpException(409, `This email ${userData.email} was not found`);
+      if (!findUser) throw new HttpException(204, `This email ${userData.email} was not found`);
 
       const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-      if (!isPasswordMatching) throw new HttpException(409, 'Password is not matching');
+      if (!isPasswordMatching) throw new HttpException(204, 'Password is not matching');
 
       const tokenData = this.createToken(findUser);
       const cookie = this.createCookie(tokenData);
@@ -55,20 +55,20 @@ class AuthService {
   }
 
   public async logout(userData: User): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
+    if (isEmpty(userData)) throw new HttpException(204, 'userData is empty');
 
     const findUser: User = await this.users.findOne({ email: userData.email, password: userData.password });
-    if (!findUser) throw new HttpException(409, `This email ${userData.email} was not found`);
+    if (!findUser) throw new HttpException(204, `This email ${userData.email} was not found`);
 
     return findUser;
   }
 
   public async findUserData(userData: User): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
+    if (isEmpty(userData)) throw new HttpException(204, 'userData is empty');
 
     if (userData) {
       const findUser: User = await this.users.findOne({ email: userData.email, mobile: userData.mobile });
-      if (!findUser) throw new HttpException(409, `No user found`);
+      if (!findUser) throw new HttpException(204, `No user found`);
 
       return findUser;
     }
