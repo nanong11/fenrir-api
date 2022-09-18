@@ -8,7 +8,6 @@ export interface User {
   address: object;
   birthday: string;
   facebook: string;
-  post: any[];
   role: string;
   isActive: boolean;
 }

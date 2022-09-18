@@ -25,9 +25,6 @@ export class CreateUserDto {
   @IsString()
   public facebook: string;
 
-  @IsArray()
-  public post: any[];
-
   @IsString()
   public role: string;
 

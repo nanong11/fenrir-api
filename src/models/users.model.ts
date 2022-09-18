@@ -36,10 +36,6 @@ const userSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  post: {
-    type: Array,
-    required: true,
-  },
   role: {
     type: String,
     required: true,
