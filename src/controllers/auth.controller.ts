@@ -41,6 +41,17 @@ class AuthController {
       next(error);
     }
   };
+
+  public findUserData = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const userData: User = req.user;
+      const findUser: User = await this.authService.findUserData(userData);
+
+      res.status(200).json({ data: findUser, message: 'validated cookie' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default AuthController;

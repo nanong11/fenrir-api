@@ -63,6 +63,17 @@ class AuthService {
     return findUser;
   }
 
+  public async findUserData(userData: User): Promise<User> {
+    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
+
+    if (userData) {
+      const findUser: User = await this.users.findOne({ email: userData.email, mobile: userData.mobile });
+      if (!findUser) throw new HttpException(409, `No user found`);
+
+      return findUser;
+    }
+  }
+
   public createToken(user: User): TokenData {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     const secretKey: string = SECRET_KEY;
