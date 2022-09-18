@@ -19,6 +19,7 @@ class UsersRoute implements Routes {
     this.router.get(`${this.path}/:id`, authMiddleware, this.usersController.getUserById);
     this.router.post(`${this.path}`, authMiddleware, validationMiddleware(CreateUserDto, 'body'), this.usersController.createUser);
     this.router.put(`${this.path}/:id`, authMiddleware, validationMiddleware(CreateUserDto, 'body', true), this.usersController.updateUser);
+    this.router.post(`${this.path}/check_mobile_email`, this.usersController.checkMobileEmail);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
   }
 }

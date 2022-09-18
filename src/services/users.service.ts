@@ -53,6 +53,22 @@ class UserService {
     return updateUserById;
   }
 
+  public async checkMobile(userMobile: number): Promise<Boolean> {
+    if (isEmpty(userMobile)) throw new HttpException(400, 'userMobile is empty');
+
+    const findUser: User = await this.users.findOne({ mobile: userMobile });
+
+    return findUser?.mobile === userMobile ? true : false;
+  }
+
+  public async checkEmail(userEmail: string): Promise<Boolean> {
+    if (isEmpty(userEmail)) throw new HttpException(400, 'userEmail is empty');
+
+    const findUser: User = await this.users.findOne({ email: userEmail });
+
+    return findUser?.email === userEmail ? true : false;
+  }
+
   public async deleteUser(userId: string): Promise<User> {
     const deleteUserById: User = await this.users.findByIdAndDelete(userId);
     if (!deleteUserById) throw new HttpException(409, "User doesn't exist");
