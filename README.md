@@ -18,9 +18,10 @@ yarn lint
 yarn lint:fix
 
 # How to create resources
-1. Create Interface
-2. Create Model
-3. Create Controller
-4. Create Service
-5. Create Routes
-6. Impot Routes to Server
+Create Model
+Create Interface
+Create Dtos
+Create Routes
+Create Service
+Create Controller
+Impot Routes to Server
