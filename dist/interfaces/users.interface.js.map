@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/interfaces/users.interface.ts"],"sourcesContent":["export interface User {\n  _id: string;\n  email: string;\n  password: string;\n  mobile: number;\n  firstName: string;\n  lastName: string;\n  address: object;\n  birthday: string;\n  facebook: string;\n  role: string;\n  isActive: boolean;\n}\n"],"names":[],"mappings":"AAAA"}
