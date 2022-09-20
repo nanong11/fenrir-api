@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/interfaces/testData.interface.ts"],"sourcesContent":["// CREATE AN INTERFACE\nexport interface TestData {\n  _id: string;\n  name: string;\n  age: number;\n}\n"],"names":[],"mappings":"AACA"}
