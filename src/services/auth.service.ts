@@ -26,7 +26,7 @@ class AuthService {
     return createUserData;
   }
 
-  public async login(userData: CreateUserDto): Promise<{ cookie: string; findUser: User }> {
+  public async login(userData: CreateUserDto): Promise<{ cookie: string; token: string; findUser: User }> {
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     if (userData.mobile) {
@@ -37,9 +37,10 @@ class AuthService {
       if (!isPasswordMatching) throw new HttpException(401, 'Password is not matching');
 
       const tokenData = this.createToken(findUser);
+      const token = tokenData.token;
       const cookie = this.createCookie(tokenData);
 
-      return { cookie, findUser };
+      return { cookie, token, findUser };
     } else {
       const findUser: User = await this.users.findOne({ email: userData.email });
       if (!findUser) throw new HttpException(404, `This email ${userData.email} was not found`);
@@ -48,9 +49,10 @@ class AuthService {
       if (!isPasswordMatching) throw new HttpException(401, 'Password is not matching');
 
       const tokenData = this.createToken(findUser);
+      const token = tokenData.token;
       const cookie = this.createCookie(tokenData);
 
-      return { cookie, findUser };
+      return { cookie, token, findUser };
     }
   }
 
