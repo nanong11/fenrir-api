@@ -7,8 +7,10 @@ import userModel from '@models/users.model';
 
 const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
-    const Authorization = req.cookies['Authorization'] || (req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null);
-
+    // Disable use of cookie but still set in
+    // const Authorization = req.cookies['Authorization'] || (req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null);
+    const Authorization = req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null;
+    // console.log('Authorization', Authorization);
     if (Authorization) {
       const secretKey: string = SECRET_KEY;
       const verificationResponse = (await verify(Authorization, secretKey)) as DataStoredInToken;
@@ -22,7 +24,7 @@ const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFun
         next(new HttpException(401, 'Wrong authentication token'));
       }
     } else {
-      next(new HttpException(404, 'Authentication token missing'));
+      next(new HttpException(204, 'Authentication token missing'));
     }
   } catch (error) {
     next(new HttpException(401, 'Wrong authentication token'));
