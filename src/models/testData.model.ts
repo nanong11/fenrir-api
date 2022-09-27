@@ -3,17 +3,20 @@ import { model, Schema, Document } from 'mongoose';
 // Import interface
 import { TestData } from '@interfaces/testData.interface';
 
-const testDataSchema: Schema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
+const testDataSchema: Schema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    age: {
+      type: Number,
+      required: true,
+    },
   },
-  age: {
-    type: Number,
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 const testDataModel = model<TestData & Document>('TestData', testDataSchema);
 
