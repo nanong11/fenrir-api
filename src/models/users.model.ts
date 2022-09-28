@@ -35,7 +35,18 @@ const userSchema: Schema = new Schema(
     },
     facebook: {
       type: String,
-      required: true,
+    },
+    profilePic: {
+      type: String,
+    },
+    about: {
+      type: String,
+    },
+    verifiedPhone: {
+      type: Boolean,
+    },
+    verifiedUser: {
+      type: Boolean,
     },
     role: {
       type: String,

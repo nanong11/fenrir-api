@@ -10,4 +10,8 @@ export interface User {
   facebook: string;
   role: string;
   isActive: boolean;
+  profilePic: string;
+  about: string;
+  verifiedPhone: boolean;
+  verifiedUser: boolean;
 }

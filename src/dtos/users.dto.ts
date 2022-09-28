@@ -23,9 +23,6 @@ export class CreateUserDto {
   public birthday: string;
 
   @IsString()
-  public facebook: string;
-
-  @IsString()
   public role: string;
 
   @IsBoolean()
