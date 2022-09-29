@@ -7,9 +7,9 @@ export interface User {
   lastName: string;
   address: object;
   birthday: string;
-  facebook: string;
   role: string;
   isActive: boolean;
+  facebook: string;
   profilePic: string;
   about: string;
   verifiedPhone: boolean;

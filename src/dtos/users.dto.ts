@@ -27,4 +27,19 @@ export class CreateUserDto {
 
   @IsBoolean()
   public isActive: boolean;
+
+  @IsString()
+  public facebook: string;
+
+  @IsString()
+  public profilePic: string;
+
+  @IsString()
+  public about: string;
+
+  @IsBoolean()
+  public verifiedPhone: boolean;
+
+  @IsBoolean()
+  public verifiedUser: boolean;
 }
