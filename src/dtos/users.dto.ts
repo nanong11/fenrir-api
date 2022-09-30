@@ -29,7 +29,7 @@ export class CreateUserDto {
   public isActive: boolean;
 
   @IsString()
-  public facebook: string;
+  public socialMedia: Array<object>;
 
   @IsString()
   public profilePic: string;

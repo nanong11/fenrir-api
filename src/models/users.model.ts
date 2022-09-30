@@ -41,8 +41,8 @@ const userSchema: Schema = new Schema(
       type: Boolean,
       required: true,
     },
-    facebook: {
-      type: String,
+    socialMedia: {
+      type: Array,
       default: null,
     },
     profilePic: {
