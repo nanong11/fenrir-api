@@ -42,7 +42,7 @@ const userSchema: Schema = new Schema(
       required: true,
     },
     socialMedia: {
-      type: Array,
+      type: Object,
       default: null,
     },
     profilePic: {

@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsNumber, IsObject, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -28,8 +28,8 @@ export class CreateUserDto {
   @IsBoolean()
   public isActive: boolean;
 
-  @IsString()
-  public socialMedia: Array<object>;
+  @IsObject()
+  public socialMedia: object;
 
   @IsString()
   public profilePic: string;

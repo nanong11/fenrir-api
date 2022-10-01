@@ -9,7 +9,7 @@ export interface User {
   birthday: string;
   role: string;
   isActive: boolean;
-  socialMedia: Array<object>;
+  socialMedia: object;
   profilePic: string;
   about: string;
   verifiedPhone: boolean;
