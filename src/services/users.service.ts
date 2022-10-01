@@ -42,6 +42,11 @@ class UserService {
       if (findUser && findUser._id != userId) throw new HttpException(409, `This email ${userData.email} already exists`);
     }
 
+    if (userData.mobile) {
+      const findUser: User = await this.users.findOne({ mobile: userData.mobile });
+      if (findUser && findUser._id != userId) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
+    }
+
     if (userData.password) {
       const hashedPassword = await hash(userData.password, 10);
       userData = { ...userData, password: hashedPassword };
