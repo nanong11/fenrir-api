@@ -46,7 +46,7 @@ const userSchema: Schema = new Schema(
       default: null,
     },
     profilePic: {
-      type: String,
+      type: Object,
       default: null,
     },
     about: {
