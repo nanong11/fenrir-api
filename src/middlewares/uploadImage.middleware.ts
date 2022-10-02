@@ -30,8 +30,8 @@ const uploadImageMiddleware = async (req: Request, res: Response, next: NextFunc
         ContentEncoding: 'base64',
         ContentType: `image/${type}`,
       };
-
-      s3.upload(params, function (err: any, params: any) {
+      const options = { partSize: 10 * 1024 * 1024, queueSize: 1 };
+      s3.upload(params, options, function (err: any, params: any) {
         console.log(err, params);
         req.body.profilePic = {
           id: uniqueId,
