@@ -23,11 +23,23 @@ export class CreateUserDto {
   public birthday: string;
 
   @IsString()
-  public facebook: string;
-
-  @IsString()
   public role: string;
 
   @IsBoolean()
   public isActive: boolean;
+
+  @IsObject()
+  public socialMedia: object;
+
+  @IsObject()
+  public profilePic: object;
+
+  @IsString()
+  public about: string;
+
+  @IsBoolean()
+  public verifiedPhone: boolean;
+
+  @IsBoolean()
+  public verifiedUser: boolean;
 }

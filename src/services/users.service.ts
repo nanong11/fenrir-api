@@ -42,12 +42,17 @@ class UserService {
       if (findUser && findUser._id != userId) throw new HttpException(409, `This email ${userData.email} already exists`);
     }
 
+    if (userData.mobile) {
+      const findUser: User = await this.users.findOne({ mobile: userData.mobile });
+      if (findUser && findUser._id != userId) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
+    }
+
     if (userData.password) {
       const hashedPassword = await hash(userData.password, 10);
       userData = { ...userData, password: hashedPassword };
     }
 
-    const updateUserById: User = await this.users.findByIdAndUpdate(userId, { userData });
+    const updateUserById: User = await this.users.findByIdAndUpdate(userId, userData, { new: true });
     if (!updateUserById) throw new HttpException(409, "User doesn't exist");
 
     return updateUserById;

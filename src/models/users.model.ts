@@ -33,10 +33,6 @@ const userSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    facebook: {
-      type: String,
-      required: true,
-    },
     role: {
       type: String,
       required: true,
@@ -44,6 +40,26 @@ const userSchema: Schema = new Schema(
     isActive: {
       type: Boolean,
       required: true,
+    },
+    socialMedia: {
+      type: Object,
+      default: null,
+    },
+    profilePic: {
+      type: Object,
+      default: null,
+    },
+    about: {
+      type: String,
+      default: null,
+    },
+    verifiedPhone: {
+      type: Boolean,
+      default: null,
+    },
+    verifiedUser: {
+      type: Boolean,
+      default: null,
     },
   },
   { timestamps: true },

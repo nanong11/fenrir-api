@@ -7,7 +7,14 @@ export interface User {
   lastName: string;
   address: object;
   birthday: string;
-  facebook: string;
   role: string;
   isActive: boolean;
+  socialMedia: object;
+  profilePic: {
+    id: string;
+    type: string;
+  };
+  about: string;
+  verifiedPhone: boolean;
+  verifiedUser: boolean;
 }
