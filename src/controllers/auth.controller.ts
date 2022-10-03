@@ -3,8 +3,6 @@ import { CreateUserDto } from '@dtos/users.dto';
 import { RequestWithUser } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import AuthService from '@services/auth.service';
-import * as AWS from 'aws-sdk';
-import { AWS_S3_BUCKET_NAME, AWS_S3_REGION, AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY } from '@/config';
 
 class AuthController {
   public authService = new AuthService();
@@ -49,31 +47,7 @@ class AuthController {
       const userData: User = req.user;
       const findUser: User = await this.authService.findUserData(userData);
 
-      if (findUser.profilePic.id) {
-        const bucketName: string = AWS_S3_BUCKET_NAME;
-        const region: string = AWS_S3_REGION;
-        const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
-        const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
-        AWS.config.update({
-          region,
-          accessKeyId,
-          secretAccessKey,
-        });
-        const s3 = new AWS.S3();
-        const params = {
-          Bucket: bucketName,
-          Key: findUser.profilePic.id,
-        };
-        s3.getObject(params, function (err: any, params: any) {
-          // console.log(err, params1);
-          const buff: any = Buffer.from(params.Body, 'base64');
-          const base64123 = buff.toString('base64');
-          findUser.profilePic.id = base64123;
-          res.status(200).json({ data: findUser, message: 'validated cookie' });
-        });
-      } else {
-        res.status(200).json({ data: findUser, message: 'validated cookie' });
-      }
+      res.status(200).json({ data: findUser, message: 'validated cookie' });
     } catch (error) {
       next(error);
     }

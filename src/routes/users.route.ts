@@ -4,7 +4,7 @@ import { CreateUserDto } from '@dtos/users.dto';
 import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@middlewares/auth.middleware';
-import uploadImageMiddleware from '@middlewares/uploadImage.middleware';
+import uploadProfileImageMiddleware from '@middlewares/uploadProfileImage.middleware';
 
 class UsersRoute implements Routes {
   public path = '/users';
@@ -23,10 +23,11 @@ class UsersRoute implements Routes {
       `${this.path}/:id`,
       authMiddleware,
       validationMiddleware(CreateUserDto, 'body', true),
-      uploadImageMiddleware,
+      uploadProfileImageMiddleware,
       this.usersController.updateUser,
     );
     this.router.post(`${this.path}/check_mobile_email`, this.usersController.checkMobileEmail);
+    this.router.get(`${this.path}/get_profile_photo/:id`, authMiddleware, this.usersController.getProfilePhoto);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
   }
 }
