@@ -9,7 +9,6 @@ class TestDataController {
   public testDataService = new testDataService();
 
   public getTestData = async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Testing', req);
     try {
       const findAllTestData: TestData[] = await this.testDataService.findAllTestData();
 
