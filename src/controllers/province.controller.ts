@@ -50,6 +50,38 @@ class ProvinceController {
     }
   };
 
+  public findAllProvinceOnly = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const findAllProvinceOnly: Province[] = await this.provinceService.findAllProvinceOnly();
+
+      res.status(200).json({ data: findAllProvinceOnly, message: 'findAllProvince' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public findAllCityOnly = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const province: string = req.params.province;
+      const findAllCityOnly: Province[] = await this.provinceService.findAllCityOnly(province);
+
+      res.status(200).json({ data: findAllCityOnly, message: 'findAllCity' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public findAllBrgyOnly = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const city: string = req.params.city;
+      const findAllBrgyOnly: Province[] = await this.provinceService.findAllBrgyOnly(city);
+
+      res.status(200).json({ data: findAllBrgyOnly, message: 'findAllBrgy' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public deleteProvince = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const provinceId: string = req.params.id;

@@ -15,7 +15,10 @@ class ProvinceRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}`, authMiddleware, this.provinceController.getAllProvince);
+    this.router.get(`${this.path}`, this.provinceController.getAllProvince);
+    this.router.get(`${this.path}/province`, this.provinceController.findAllProvinceOnly);
+    this.router.get(`${this.path}/city/:province`, this.provinceController.findAllCityOnly);
+    this.router.get(`${this.path}/brgy/:city`, this.provinceController.findAllBrgyOnly);
     this.router.get(`${this.path}/:id`, authMiddleware, this.provinceController.getProvinceById);
     this.router.post(`${this.path}`, authMiddleware, validationMiddleware(CreateProvinceDto, 'body'), this.provinceController.createProvince);
     this.router.put(

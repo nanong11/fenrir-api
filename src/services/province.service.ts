@@ -8,7 +8,7 @@ class ProvinceService {
   public province = provinceModel;
 
   public async findAllProvince(): Promise<Province[]> {
-    const province: Province[] = await this.province.find().sort({ field: 'asc', brgy: 1 });
+    const province: Province[] = await this.province.find();
     return province;
   }
 
@@ -45,6 +45,41 @@ class ProvinceService {
     if (!updateProvinceById) throw new HttpException(409, "Province doesn't exist");
 
     return updateProvinceById;
+  }
+
+  public async findAllProvinceOnly(): Promise<Province[]> {
+    const findAllProvinceOnly: Province[] = await this.province.aggregate([
+      {
+        $group: { _id: '$province' },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return findAllProvinceOnly;
+  }
+
+  public async findAllCityOnly(province: string): Promise<Province[]> {
+    const findAllProvinceOnly: Province[] = await this.province.aggregate([
+      { $match: { province: province } },
+      {
+        $group: { _id: '$city' },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return findAllProvinceOnly;
+  }
+
+  public async findAllBrgyOnly(city: string): Promise<Province[]> {
+    const findAllProvinceOnly: Province[] = await this.province.aggregate([
+      { $match: { city: city } },
+      {
+        $group: { _id: '$brgy' },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return findAllProvinceOnly;
   }
 
   public async deleteProvince(provinceId: string): Promise<Province> {
