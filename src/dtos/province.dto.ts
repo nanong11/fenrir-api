@@ -11,5 +11,5 @@ export class CreateProvinceDto {
   public brgy: string;
 
   @IsString()
-  public region: Object;
+  public region: string;
 }

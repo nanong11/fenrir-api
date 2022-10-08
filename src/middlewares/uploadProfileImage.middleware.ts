@@ -37,7 +37,7 @@ const uploadProfileImageMiddleware = async (req: Request, res: Response, next: N
         // console.log(err, params);
         if (params) {
           req.body.profilePic = {
-            id: uniqueId,
+            id: params.key,
             type: type,
           };
           console.log('UPLOAD_PROFILE_IMAGE_END');
