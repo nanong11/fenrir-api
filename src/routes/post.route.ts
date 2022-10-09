@@ -16,8 +16,8 @@ class UsersRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}`, authMiddleware, this.postController.getAllPost);
-    this.router.get(`${this.path}/:id`, authMiddleware, this.postController.getPostById);
+    this.router.get(`${this.path}`, this.postController.getAllPost);
+    this.router.get(`${this.path}/:id`, this.postController.getPostById);
     this.router.post(
       `${this.path}`,
       authMiddleware,
@@ -26,7 +26,6 @@ class UsersRoute implements Routes {
       this.postController.createPost,
     );
     this.router.put(`${this.path}/:id`, authMiddleware, validationMiddleware(CreatePostDto, 'body', true), this.postController.updatePost);
-    this.router.post(`${this.path}/load_post_images`, authMiddleware, this.postController.loadPostImages);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.postController.deletePost);
   }
 }

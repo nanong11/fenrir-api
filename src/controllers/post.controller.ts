@@ -12,7 +12,73 @@ class PostController {
     try {
       const findAllPost: Post[] = await this.postService.findAllPost();
 
-      res.status(200).json({ data: findAllPost, message: 'findAllPost' });
+      const rawFindAllPost = [];
+      findAllPost.map(post => {
+        const imageArray = post.photos;
+        const photos = [];
+        imageArray.map((image: { id: string; type: string; status: string }) => {
+          const imageId = image.id;
+          const type = image.type;
+          const status = image.status;
+
+          if (status === 'success') {
+            const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
+            const region: string = AWS_S3_REGION;
+            const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
+            const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
+
+            AWS.config.update({
+              region,
+              accessKeyId,
+              secretAccessKey,
+            });
+
+            const s3 = new AWS.S3();
+            const params = {
+              Bucket: bucketName,
+              Key: imageId,
+            };
+
+            console.log('LOAD_POST_IMAGE_START');
+            s3.getObject(params, function (err: any, params: any) {
+              // console.log(err, params1);
+              if (params) {
+                const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                const imageBase64 = `data:${type};base64,${base64}`;
+                photos.push({
+                  imageUrl: imageBase64,
+                  type: type,
+                  status: 'success',
+                });
+                console.log('PHOTOS_LOADED_SUCCESS', photos);
+              } else {
+                photos.push({
+                  imageUrl: null,
+                  type: null,
+                  statys: 'failed',
+                });
+                console.log('PHOTOS_LOADED_ERROR', photos);
+              }
+
+              if (photos.length === imageArray.length) {
+                console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
+                (post.photos = photos),
+                  rawFindAllPost.push({
+                    ...post,
+                  });
+              }
+
+              if (rawFindAllPost.length === findAllPost.length) {
+                const newFindAllPost = [];
+                rawFindAllPost.map(post => {
+                  newFindAllPost.push(post._doc);
+                });
+                res.status(200).json({ data: newFindAllPost, message: 'findAllPost' });
+              }
+            });
+          }
+        });
+      });
     } catch (error) {
       next(error);
     }
@@ -47,67 +113,6 @@ class PostController {
       const updatePostData: Post = await this.postService.updatePost(postId, postData);
 
       res.status(200).json({ data: updatePostData, message: 'updatedPost' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public loadPostImages = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      if (req.body.imageArray && req.body.imageArray.length > 0) {
-        const imageArray = req.body.imageArray;
-        const photos = [];
-        imageArray.map((image: { id: string; type: string; status: string }) => {
-          const imageId = image.id;
-          const type = image.type;
-          const status = image.status;
-
-          if (status === 'success') {
-            const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
-            const region: string = AWS_S3_REGION;
-            const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
-            const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
-
-            AWS.config.update({
-              region,
-              accessKeyId,
-              secretAccessKey,
-            });
-
-            const s3 = new AWS.S3();
-            const params = {
-              Bucket: bucketName,
-              Key: imageId,
-            };
-
-            console.log('LOAD_POST_IMAGE_START');
-            s3.getObject(params, function (err: any, params: any) {
-              // console.log(err, params1);
-              if (params) {
-                const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
-                photos.push({
-                  imageUrl: base64,
-                  type: type,
-                  status: 'success',
-                });
-                console.log('PHOTOS_LOADED_SUCCESS', photos);
-              } else {
-                photos.push({
-                  imageUrl: null,
-                  type: null,
-                  statys: 'failed',
-                });
-                console.log('PHOTOS_LOADED_ERROR', photos);
-              }
-
-              if (photos.length === imageArray.length) {
-                console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
-                res.status(200).json({ data: photos, message: 'Load Image Success' });
-              }
-            });
-          }
-        });
-      }
     } catch (error) {
       next(error);
     }
