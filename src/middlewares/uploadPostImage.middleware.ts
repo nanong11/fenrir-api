@@ -3,13 +3,14 @@ import { AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_S3_REGION, AWS_S3_A
 import { HttpException } from '@exceptions/HttpException';
 import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import sharp from 'sharp';
 
 const uploadPostImageMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (req.body.photos && req.body.photos.length > 0) {
       const imageUrlArray = req.body.photos;
       const photos = [];
-      imageUrlArray.map((imageUrl: string) => {
+      imageUrlArray.map(async (imageUrl: string) => {
         const base64Data: any = Buffer.from(imageUrl.replace(/^data:image\/\w+;base64,/, ''), 'base64');
         const type: string = imageUrl.split(';')[0].split('/')[1];
         const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
@@ -17,6 +18,17 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
         const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
         const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
         const uniqueId = uuidv4();
+
+        const base64DataWebp = await sharp(base64Data)
+          .toFormat('webp')
+          .toBuffer()
+          .then(data => {
+            return data;
+          })
+          .catch(err => {
+            console.log('Sharp Convert Error', err);
+            return base64Data;
+          });
 
         AWS.config.update({
           region,
@@ -28,7 +40,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
         const params = {
           Bucket: bucketName,
           Key: uniqueId,
-          Body: base64Data,
+          Body: base64DataWebp,
           // ACL: 'public-read',
           ContentEncoding: 'base64',
           ContentType: `image/${type}`,

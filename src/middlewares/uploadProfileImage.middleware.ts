@@ -3,6 +3,7 @@ import { AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_S3_REGION, AWS_S3_A
 import { HttpException } from '@exceptions/HttpException';
 import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import sharp from 'sharp';
 
 const uploadProfileImageMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -15,6 +16,17 @@ const uploadProfileImageMiddleware = async (req: Request, res: Response, next: N
       const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
       const uniqueId = uuidv4();
 
+      const base64DataWebp = await sharp(base64Data)
+        .toFormat('webp')
+        .toBuffer()
+        .then(data => {
+          return data;
+        })
+        .catch(err => {
+          console.log('Sharp Convert Error', err);
+          return base64Data;
+        });
+
       AWS.config.update({
         region,
         accessKeyId,
@@ -25,7 +37,7 @@ const uploadProfileImageMiddleware = async (req: Request, res: Response, next: N
       const params = {
         Bucket: bucketName,
         Key: uniqueId,
-        Body: base64Data,
+        Body: base64DataWebp,
         // ACL: 'public-read',
         ContentEncoding: 'base64',
         ContentType: `image/${type}`,
