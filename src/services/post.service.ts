@@ -12,6 +12,19 @@ class PostService {
     return posts;
   }
 
+  public async findAllPostCount(): Promise<any> {
+    const postsCount: any = await this.post.count();
+    return postsCount;
+  }
+
+  public async findPostInitialLoad(oldestPostCreatedAt: any): Promise<Post[]> {
+    const posts: Post[] = await this.post
+      .find({ createdAt: { $lt: oldestPostCreatedAt } })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    return posts;
+  }
+
   public async findPostById(postId: string): Promise<Post> {
     if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
 

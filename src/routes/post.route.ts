@@ -17,6 +17,8 @@ class UsersRoute implements Routes {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, this.postController.getAllPost);
+    this.router.get(`${this.path}/count`, this.postController.getAllPostCount);
+    this.router.post(`${this.path}/initial_load`, this.postController.getPostInitialLoad);
     this.router.get(`${this.path}/:id`, this.postController.getPostById);
     this.router.post(
       `${this.path}`,

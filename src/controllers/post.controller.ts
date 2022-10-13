@@ -12,9 +12,30 @@ class PostController {
     try {
       const findAllPost: Post[] = await this.postService.findAllPost();
 
-      if (findAllPost && findAllPost.length > 0) {
-        const rawFindAllPost = [];
-        findAllPost.map(post => {
+      res.status(200).json({ data: findAllPost, message: 'findAllPost' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllPostCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const findAllPostCount: any = await this.postService.findAllPostCount();
+
+      res.status(200).json({ data: findAllPostCount, message: 'findAllPostCount' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getPostInitialLoad = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const oldestPostCreatedAt = req.body.date;
+      console.log('oldestPostCreatedAt', oldestPostCreatedAt);
+      const findPostInitialLoad: Post[] = await this.postService.findPostInitialLoad(oldestPostCreatedAt);
+      if (findPostInitialLoad && findPostInitialLoad.length > 0) {
+        const rawFindPostInitialLoad = [];
+        findPostInitialLoad.map(post => {
           const imageArray = post.photos;
           const photos = [];
           imageArray.map((image: { id: string; type: string; status: string }) => {
@@ -64,24 +85,23 @@ class PostController {
                 if (photos.length === imageArray.length) {
                   console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
                   (post.photos = photos),
-                    rawFindAllPost.push({
+                    rawFindPostInitialLoad.push({
                       ...post,
                     });
                 }
-
-                if (rawFindAllPost.length === findAllPost.length) {
-                  const newFindAllPost = [];
-                  rawFindAllPost.map(post => {
-                    newFindAllPost.push(post._doc);
+                if (rawFindPostInitialLoad.length === findPostInitialLoad.length) {
+                  const newFindPostInitialLoad = [];
+                  rawFindPostInitialLoad.map(post => {
+                    newFindPostInitialLoad.push(post._doc);
                   });
-                  res.status(200).json({ data: newFindAllPost, message: 'findAllPost' });
+                  res.status(200).json({ data: newFindPostInitialLoad, message: 'FindPostInitialLoad' });
                 }
               });
             }
           });
         });
       } else {
-        res.status(200).json({ data: findAllPost, message: 'Post is empty' });
+        res.status(200).json({ data: findPostInitialLoad, message: 'Post is empty' });
       }
     } catch (error) {
       next(error);
