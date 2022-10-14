@@ -12,7 +12,8 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
       const photos = [];
       imageUrlArray.map(async (imageUrl: string) => {
         const base64Data: any = Buffer.from(imageUrl.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-        const type: string = imageUrl.split(';')[0].split('/')[1];
+        // const type: string = imageUrl.split(';')[0].split('/')[1];
+        const type = 'webp';
         const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
         const region: string = AWS_S3_REGION;
         const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
@@ -20,6 +21,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
         const uniqueId = uuidv4();
 
         const base64DataWebp = await sharp(base64Data)
+          .resize(1080, 1080)
           .toFormat('webp')
           .toBuffer()
           .then(data => {

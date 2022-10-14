@@ -28,14 +28,14 @@ class PostController {
     }
   };
 
-  public getPostInitialLoad = async (req: Request, res: Response, next: NextFunction) => {
+  public loadPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const oldestPostCreatedAt = req.body.date;
-      console.log('oldestPostCreatedAt', oldestPostCreatedAt);
-      const findPostInitialLoad: Post[] = await this.postService.findPostInitialLoad(oldestPostCreatedAt);
-      if (findPostInitialLoad && findPostInitialLoad.length > 0) {
-        const rawFindPostInitialLoad = [];
-        findPostInitialLoad.map(post => {
+      // console.log('oldestPostCreatedAt', oldestPostCreatedAt);
+      const loadPostData: Post[] = await this.postService.loadPost(oldestPostCreatedAt);
+      if (loadPostData && loadPostData.length > 0) {
+        const rawLoadPostData = [];
+        loadPostData.map(post => {
           const imageArray = post.photos;
           const photos = [];
           imageArray.map((image: { id: string; type: string; status: string }) => {
@@ -77,7 +77,7 @@ class PostController {
                   photos.push({
                     imageUrl: null,
                     type: null,
-                    statys: 'failed',
+                    status: 'failed',
                   });
                   console.log('PHOTOS_LOADED_ERROR', photos);
                 }
@@ -85,23 +85,23 @@ class PostController {
                 if (photos.length === imageArray.length) {
                   console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
                   (post.photos = photos),
-                    rawFindPostInitialLoad.push({
+                    rawLoadPostData.push({
                       ...post,
                     });
                 }
-                if (rawFindPostInitialLoad.length === findPostInitialLoad.length) {
-                  const newFindPostInitialLoad = [];
-                  rawFindPostInitialLoad.map(post => {
-                    newFindPostInitialLoad.push(post._doc);
+                if (rawLoadPostData.length === loadPostData.length) {
+                  const newLoadPostData = [];
+                  rawLoadPostData.map(post => {
+                    newLoadPostData.push(post._doc);
                   });
-                  res.status(200).json({ data: newFindPostInitialLoad, message: 'FindPostInitialLoad' });
+                  res.status(200).json({ data: newLoadPostData, message: 'FindPostLoad' });
                 }
               });
             }
           });
         });
       } else {
-        res.status(200).json({ data: findPostInitialLoad, message: 'Post is empty' });
+        res.status(200).json({ data: loadPostData, message: 'Post is empty' });
       }
     } catch (error) {
       next(error);
@@ -124,7 +124,64 @@ class PostController {
       const postData: CreatePostDto = req.body;
       const createPostData: Post = await this.postService.createPost(postData);
 
-      res.status(201).json({ data: createPostData, message: 'createdPost' });
+      if (createPostData && createPostData.photos.length > 0) {
+        const imageArray = createPostData.photos;
+        const photos = [];
+        imageArray.map((image: { id: string; type: string; status: string }) => {
+          const imageId = image.id;
+          const type = image.type;
+          const status = image.status;
+
+          if (status === 'success') {
+            const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
+            const region: string = AWS_S3_REGION;
+            const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
+            const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
+
+            AWS.config.update({
+              region,
+              accessKeyId,
+              secretAccessKey,
+            });
+
+            const s3 = new AWS.S3();
+            const params = {
+              Bucket: bucketName,
+              Key: imageId,
+            };
+
+            console.log('LOAD_POST_IMAGE_START');
+            s3.getObject(params, function (err: any, params: any) {
+              // console.log(err, params1);
+              if (params) {
+                const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                const imageBase64 = `data:${type};base64,${base64}`;
+                photos.push({
+                  imageUrl: imageBase64,
+                  type: type,
+                  status: 'success',
+                });
+                console.log('PHOTOS_LOADED_SUCCESS', photos);
+              } else {
+                photos.push({
+                  imageUrl: null,
+                  type: null,
+                  status: 'failed',
+                });
+                console.log('PHOTOS_LOADED_ERROR', photos);
+              }
+
+              if (photos.length === imageArray.length) {
+                console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
+                createPostData.photos = photos;
+                res.status(201).json({ data: createPostData, message: 'createdPost' });
+              }
+            });
+          }
+        });
+      } else {
+        res.status(201).json({ data: createPostData, message: 'createdPost' });
+      }
     } catch (error) {
       next(error);
     }

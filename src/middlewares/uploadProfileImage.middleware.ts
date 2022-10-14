@@ -9,7 +9,8 @@ const uploadProfileImageMiddleware = async (req: Request, res: Response, next: N
   try {
     if (req.body.profilePic) {
       const base64Data: any = Buffer.from(req.body.profilePic.imageUrl.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-      const type: string = req.body.profilePic.imageUrl.split(';')[0].split('/')[1];
+      // const type: string = req.body.profilePic.imageUrl.split(';')[0].split('/')[1];
+      const type = 'webp';
       const bucketName: string = AWS_S3_ANDVARI_PROFILE_IMAGES;
       const region: string = AWS_S3_REGION;
       const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
@@ -17,6 +18,7 @@ const uploadProfileImageMiddleware = async (req: Request, res: Response, next: N
       const uniqueId = uuidv4();
 
       const base64DataWebp = await sharp(base64Data)
+        .resize(320, 320)
         .toFormat('webp')
         .toBuffer()
         .then(data => {

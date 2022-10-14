@@ -17,11 +17,11 @@ class PostService {
     return postsCount;
   }
 
-  public async findPostInitialLoad(oldestPostCreatedAt: any): Promise<Post[]> {
+  public async loadPost(oldestPostCreatedAt: any): Promise<Post[]> {
     const posts: Post[] = await this.post
       .find({ createdAt: { $lt: oldestPostCreatedAt } })
       .sort({ createdAt: -1 })
-      .limit(1);
+      .limit(3);
     return posts;
   }
 
