@@ -82,6 +82,7 @@ class UsersController {
   public getProfilePhoto = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const imageId: string = req.params.id;
+      const imageType = 'webp';
       const bucketName: string = AWS_S3_ANDVARI_PROFILE_IMAGES;
       const region: string = AWS_S3_REGION;
       const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
@@ -104,10 +105,12 @@ class UsersController {
         // console.log(err, params1);
         if (params) {
           const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
-          console.log('LOAD_PROFILE_IMAGE_END');
-          res.status(200).json({ data: base64, message: 'Load Image Success' });
+          const imageBase64 = `data:${imageType};base64,${base64}`;
+
+          console.log('LOAD_PROFILE_IMAGE_END_SUCCESS');
+          res.status(200).json({ data: imageBase64, message: 'Load Image Success' });
         } else {
-          console.log('LOAD_PROFILE_IMAGE_END');
+          console.log('LOAD_PROFILE_IMAGE_END_ERROR');
           res.status(401).json({ data: err, message: 'Load Image Failed' });
         }
       });

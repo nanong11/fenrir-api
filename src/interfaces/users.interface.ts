@@ -13,6 +13,8 @@ export interface User {
   profilePic: {
     id: string;
     type: string;
+    status: string;
+    imageUrl?: string;
   };
   about: string;
   verifiedPhone: boolean;

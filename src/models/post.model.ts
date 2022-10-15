@@ -7,6 +7,10 @@ const postSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    user: {
+      type: Object,
+      default: null,
+    },
     title: {
       type: String,
       required: true,

@@ -55,11 +55,11 @@ const userSchema: Schema = new Schema(
     },
     verifiedPhone: {
       type: Boolean,
-      default: null,
+      default: false,
     },
     verifiedUser: {
       type: Boolean,
-      default: null,
+      default: false,
     },
   },
   { timestamps: true },
