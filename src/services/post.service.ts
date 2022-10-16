@@ -3,6 +3,7 @@ import { HttpException } from '@exceptions/HttpException';
 import { Post } from '@/interfaces/post.interface';
 import postModel from '@/models/post.model';
 import { isEmpty } from '@utils/util';
+import { UpdateWishPostDto } from '@/dtos/wish.dto';
 
 class PostService {
   public post = postModel;
@@ -49,6 +50,27 @@ class PostService {
     if (!updatePostById) throw new HttpException(409, "Post doesn't exist");
 
     return updatePostById;
+  }
+
+  public async updateWishPostById(postId: string, postWishData: UpdateWishPostDto): Promise<Post> {
+    if (isEmpty(postWishData)) throw new HttpException(400, 'postData is empty');
+
+    const findPost: Post = await this.post.findOne({ _id: postId });
+    if (!findPost) throw new HttpException(409, "Post doesn't exist");
+
+    const wishExist: any = findPost.wishes.find(
+      (wish: { userId: string; firstName: string; lastName: string }) => wish.userId === postWishData.userId,
+    );
+
+    if (wishExist) {
+      const updateWishPostById: Post = await this.post.findByIdAndUpdate(postId, { $pull: { wishes: { userId: wishExist.userId } } }, { new: true });
+
+      return updateWishPostById;
+    } else {
+      const updateWishPostById: Post = await this.post.findByIdAndUpdate(postId, { $push: { wishes: postWishData } }, { new: true });
+
+      return updateWishPostById;
+    }
   }
 
   public async deletePost(postId: string): Promise<Post> {

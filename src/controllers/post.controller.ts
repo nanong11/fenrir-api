@@ -6,6 +6,7 @@ import { AWS_S3_ANDVARI_POST_IMAGES, AWS_S3_REGION, AWS_S3_ACCESS_KEY_ID, AWS_S3
 import * as AWS from 'aws-sdk';
 import userService from '@services/users.service';
 import { User } from '@interfaces/users.interface';
+import { UpdateWishPostDto } from '@/dtos/wish.dto';
 
 class PostController {
   public postService = new PostService();
@@ -572,6 +573,18 @@ class PostController {
       const updatePostData: Post = await this.postService.updatePost(postId, postData);
 
       res.status(200).json({ data: updatePostData, message: 'updatedPost' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public updateWishPostById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const postId: string = req.params.id;
+      const postWishData: UpdateWishPostDto = req.body;
+      const updateWishPostData: Post = await this.postService.updateWishPostById(postId, postWishData);
+
+      res.status(200).json({ data: updateWishPostData, message: 'updatedPost' });
     } catch (error) {
       next(error);
     }

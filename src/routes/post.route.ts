@@ -5,6 +5,7 @@ import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@middlewares/auth.middleware';
 import uploadPostImageMiddleware from '@/middlewares/uploadPostImage.middleware';
+import { UpdateWishPostDto } from '@/dtos/wish.dto';
 
 class UsersRoute implements Routes {
   public path = '/post';
@@ -28,6 +29,12 @@ class UsersRoute implements Routes {
       this.postController.createPost,
     );
     this.router.put(`${this.path}/:id`, authMiddleware, validationMiddleware(CreatePostDto, 'body', true), this.postController.updatePost);
+    this.router.put(
+      `${this.path}/update/wish/:id`,
+      authMiddleware,
+      validationMiddleware(UpdateWishPostDto, 'body'),
+      this.postController.updateWishPostById,
+    );
     this.router.delete(`${this.path}/:id`, authMiddleware, this.postController.deletePost);
   }
 }

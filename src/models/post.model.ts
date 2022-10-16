@@ -31,6 +31,10 @@ const postSchema: Schema = new Schema(
       type: Array,
       default: null,
     },
+    wishes: {
+      type: Array,
+      default: null,
+    },
   },
   { timestamps: true },
 );

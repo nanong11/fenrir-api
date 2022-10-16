@@ -7,4 +7,5 @@ export interface Post {
   category: string;
   price: number;
   photos: Array<object>;
+  wishes: Array<object>;
 }
