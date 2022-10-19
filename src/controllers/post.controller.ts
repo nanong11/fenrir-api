@@ -32,6 +32,17 @@ class PostController {
     }
   };
 
+  public getPostById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const postId: string = req.params.id;
+      const findOnePostData: Post = await this.postService.findPostById(postId);
+
+      res.status(200).json({ data: findOnePostData, message: 'findOnePost' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public loadPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const oldestPostCreatedAt = req.body.date;
@@ -282,12 +293,263 @@ class PostController {
     }
   };
 
-  public getPostById = async (req: Request, res: Response, next: NextFunction) => {
+  public loadPostByUserId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const postId: string = req.params.id;
-      const findOnePostData: Post = await this.postService.findPostById(postId);
+      const userId = req.body.userId;
+      const oldestPostCreatedAt = req.body.date;
+      const loadPostData: Post[] = await this.postService.loadPostByUserId(userId, oldestPostCreatedAt);
 
-      res.status(200).json({ data: findOnePostData, message: 'findOnePost' });
+      const loadPostDataWithUserDetails = [];
+      if (loadPostData && loadPostData.length > 0) {
+        loadPostData.map(async post => {
+          // First get the user of the post
+          const userId: string = post.userId;
+          const findOneUserData: User = await this.userService.findUserById(userId);
+
+          // If the user have profile pic else if not
+          if (findOneUserData && findOneUserData.profilePic) {
+            // If the user have profice pic, get the pic from s3 bucket then push it post in the new array
+            const imageId: string = findOneUserData.profilePic.id;
+            const type: string = findOneUserData.profilePic.type;
+            const status: string = findOneUserData.profilePic.status;
+
+            // If profile pic is upload successfully which is alway succesfull
+            if (status === 'success') {
+              const bucketName: string = AWS_S3_ANDVARI_PROFILE_IMAGES;
+              const region: string = AWS_S3_REGION;
+              const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
+              const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
+
+              AWS.config.update({
+                region,
+                accessKeyId,
+                secretAccessKey,
+              });
+
+              const s3 = new AWS.S3();
+              const params = {
+                Bucket: bucketName,
+                Key: imageId,
+              };
+
+              console.log('LOAD_PROFILE_IMAGE_START');
+              s3.getObject(params, function (err: any, params: any) {
+                // console.log(err, params1);
+                if (params) {
+                  const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                  const imageBase64 = `data:${type};base64,${base64}`;
+
+                  findOneUserData.profilePic = {
+                    id: imageId,
+                    type: 'webp',
+                    imageUrl: imageBase64,
+                    status: 'success',
+                  };
+                  post.user = findOneUserData;
+                  loadPostDataWithUserDetails.push(post);
+
+                  console.log('LOAD_PROFILE_IMAGE_END_SUCCES', params);
+                } else {
+                  findOneUserData.profilePic = {
+                    id: null,
+                    type: null,
+                    imageUrl: null,
+                    status: 'failed',
+                  };
+                  post.user = findOneUserData;
+                  loadPostDataWithUserDetails.push(post);
+
+                  console.log('LOAD_PROFILE_IMAGE_END_ERR', err);
+                }
+
+                // After adding all the user for each post, get the photos of each post from s3 bucket
+                if (loadPostDataWithUserDetails.length === loadPostData.length) {
+                  console.log('LOAD_POST_DATA_WITH_USER', loadPostDataWithUserDetails);
+
+                  const rawLoadPostData = [];
+                  loadPostDataWithUserDetails.map(post => {
+                    const imageArray = post.photos;
+                    const photos = [];
+                    imageArray.map((image: { id: string; type: string; status: string }) => {
+                      const imageId = image.id;
+                      const type = image.type;
+                      const status = image.status;
+
+                      if (status === 'success') {
+                        const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
+                        const region: string = AWS_S3_REGION;
+                        const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
+                        const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
+
+                        AWS.config.update({
+                          region,
+                          accessKeyId,
+                          secretAccessKey,
+                        });
+
+                        const s3 = new AWS.S3();
+                        const params = {
+                          Bucket: bucketName,
+                          Key: imageId,
+                        };
+
+                        console.log('LOAD_POST_IMAGE_START');
+                        s3.getObject(params, function (err: any, params: any) {
+                          // console.log(err, params1);
+                          if (params) {
+                            const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                            const imageBase64 = `data:${type};base64,${base64}`;
+
+                            photos.push({
+                              imageUrl: imageBase64,
+                              type: type,
+                              status: 'success',
+                            });
+
+                            console.log('PHOTOS_LOADED_SUCCESS', photos);
+                          } else {
+                            photos.push({
+                              imageUrl: null,
+                              type: null,
+                              status: 'failed',
+                            });
+
+                            console.log('PHOTOS_LOADED_ERROR', photos);
+                          }
+
+                          // After getting all the photos for each post, push it to the new array
+                          if (photos.length === imageArray.length) {
+                            console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
+                            (post.photos = photos),
+                              rawLoadPostData.push({
+                                ...post,
+                              });
+                          }
+
+                          // After pushing all the post with user and photos, select only the _doc property
+                          if (rawLoadPostData.length === loadPostDataWithUserDetails.length) {
+                            const newLoadPostData = [];
+                            rawLoadPostData.map(post => {
+                              newLoadPostData.push(post._doc);
+                            });
+
+                            console.log('NEW_LOAD_POST_DATA', newLoadPostData);
+                            res.status(200).json({ data: newLoadPostData, message: 'Load Post By UserId Success' });
+                          }
+                        });
+                      }
+                    });
+                  });
+                }
+              });
+            } else {
+              findOneUserData.profilePic = {
+                id: null,
+                type: null,
+                imageUrl: null,
+                status: 'failed',
+              };
+              post.user = findOneUserData;
+              loadPostDataWithUserDetails.push(post);
+            }
+          } else {
+            // Add the user data to the post and push it to new array
+            post.user = findOneUserData;
+            loadPostDataWithUserDetails.push(post);
+
+            // After adding all the user for each post, get the photos of each post from s3 bucket
+            if (loadPostDataWithUserDetails.length === loadPostData.length) {
+              console.log('LOAD_POST_DATA_WITH_USER', loadPostDataWithUserDetails);
+
+              const rawLoadPostData = [];
+              loadPostDataWithUserDetails.map(post => {
+                const imageArray = post.photos;
+                const photos = [];
+
+                imageArray.map((image: { id: string; type: string; status: string }) => {
+                  const imageId = image.id;
+                  const type = image.type;
+                  const status = image.status;
+
+                  if (status === 'success') {
+                    const bucketName: string = AWS_S3_ANDVARI_POST_IMAGES;
+                    const region: string = AWS_S3_REGION;
+                    const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
+                    const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
+
+                    AWS.config.update({
+                      region,
+                      accessKeyId,
+                      secretAccessKey,
+                    });
+
+                    const s3 = new AWS.S3();
+                    const params = {
+                      Bucket: bucketName,
+                      Key: imageId,
+                    };
+
+                    console.log('LOAD_POST_IMAGE_START');
+                    s3.getObject(params, function (err: any, params: any) {
+                      // console.log(err, params1);
+                      if (params) {
+                        const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                        const imageBase64 = `data:${type};base64,${base64}`;
+                        photos.push({
+                          imageUrl: imageBase64,
+                          type: type,
+                          status: 'success',
+                        });
+                        console.log('PHOTOS_LOADED_SUCCESS', photos);
+                      } else {
+                        photos.push({
+                          imageUrl: null,
+                          type: null,
+                          status: 'failed',
+                        });
+                        console.log('PHOTOS_LOADED_ERROR', photos);
+                      }
+
+                      // After getting all the photos for each post, push it to the new array
+                      if (photos.length === imageArray.length) {
+                        console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
+                        (post.photos = photos),
+                          rawLoadPostData.push({
+                            ...post,
+                          });
+                      }
+
+                      // After pushing all the post with user and photos, select only the _doc property
+                      if (rawLoadPostData.length === loadPostDataWithUserDetails.length) {
+                        const newLoadPostData = [];
+                        rawLoadPostData.map(post => {
+                          newLoadPostData.push(post._doc);
+                        });
+
+                        console.log('NEW_LOAD_POST_DATA', newLoadPostData);
+                        res.status(200).json({ data: newLoadPostData, message: 'Load Post By UserId Success' });
+                      }
+                    });
+                  }
+                });
+              });
+            }
+          }
+        });
+      } else {
+        res.status(200).json({ data: loadPostDataWithUserDetails, message: 'Post is empty' });
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllPostCountByUserId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.body.userId;
+      const getAllPostCountByUserId: any = await this.postService.getAllPostCountByUserId(userId);
+
+      res.status(200).json({ data: getAllPostCountByUserId, message: 'getAllPostCountByUserId' });
     } catch (error) {
       next(error);
     }

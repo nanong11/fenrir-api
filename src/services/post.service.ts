@@ -18,6 +18,15 @@ class PostService {
     return postsCount;
   }
 
+  public async findPostById(postId: string): Promise<Post> {
+    if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
+
+    const findPost: Post = await this.post.findOne({ _id: postId });
+    if (!findPost) throw new HttpException(409, "Post doesn't exist");
+
+    return findPost;
+  }
+
   public async loadPost(oldestPostCreatedAt: any): Promise<Post[]> {
     const posts: Post[] = await this.post
       .find({ createdAt: { $lt: oldestPostCreatedAt } })
@@ -26,13 +35,17 @@ class PostService {
     return posts;
   }
 
-  public async findPostById(postId: string): Promise<Post> {
-    if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
+  public async loadPostByUserId(userId: string, oldestPostCreatedAt: any): Promise<Post[]> {
+    const posts: Post[] = await this.post
+      .find({ userId, createdAt: { $lt: oldestPostCreatedAt } })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    return posts;
+  }
 
-    const findPost: Post = await this.post.findOne({ _id: postId });
-    if (!findPost) throw new HttpException(409, "Post doesn't exist");
-
-    return findPost;
+  public async getAllPostCountByUserId(userId: string): Promise<any> {
+    const postsCount: any = await this.post.count({ userId });
+    return postsCount;
   }
 
   public async createPost(postData: CreatePostDto): Promise<Post> {
