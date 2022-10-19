@@ -39,7 +39,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ userId, createdAt: { $lt: oldestPostCreatedAt } })
       .sort({ createdAt: -1 })
-      .limit(1);
+      .limit(10);
     return posts;
   }
 
