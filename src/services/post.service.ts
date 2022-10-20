@@ -56,6 +56,19 @@ class PostService {
     return createPostData;
   }
 
+  public async loadPostByUserIdInWishes(userId: string, oldestPostCreatedAt: any): Promise<Post[]> {
+    const posts: Post[] = await this.post
+      .find({ createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } } })
+      .sort({ createdAt: -1 })
+      .limit(10);
+    return posts;
+  }
+
+  public async getAllPostCountByUserIdInWishes(userId: string): Promise<any> {
+    const postsCount: any = await this.post.count({ wishes: { $elemMatch: { userId } } });
+    return postsCount;
+  }
+
   public async updatePost(postId: string, postData: CreatePostDto): Promise<Post> {
     if (isEmpty(postData)) throw new HttpException(400, 'postData is empty');
 

@@ -23,6 +23,8 @@ class UsersRoute implements Routes {
     this.router.post(`${this.path}/load`, this.postController.loadPost);
     this.router.post(`${this.path}/load_by_userid`, this.postController.loadPostByUserId);
     this.router.post(`${this.path}/count_by_userid`, this.postController.getAllPostCountByUserId);
+    this.router.post(`${this.path}/load_by_userid_in_wishes`, this.postController.loadPostByUserIdInWishes);
+    this.router.post(`${this.path}/count_by_userid_in_wishes`, this.postController.getAllPostCountByUserIdInWishes);
     this.router.post(
       `${this.path}`,
       authMiddleware,
