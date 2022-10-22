@@ -32,7 +32,7 @@ class UsersRoute implements Routes {
       validationMiddleware(CreatePostDto, 'body'),
       this.postController.createPost,
     );
-    this.router.put(`${this.path}/:id`, authMiddleware, validationMiddleware(CreatePostDto, 'body', true), this.postController.updatePost);
+    this.router.put(`${this.path}/:id`, authMiddleware, validationMiddleware(CreatePostDto, 'body', true, false), this.postController.updatePost);
     this.router.put(
       `${this.path}/update/wish/:id`,
       authMiddleware,

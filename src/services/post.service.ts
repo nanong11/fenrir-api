@@ -14,14 +14,14 @@ class PostService {
   }
 
   public async findAllPostCount(): Promise<any> {
-    const postsCount: any = await this.post.count();
+    const postsCount: any = await this.post.count({ active: true });
     return postsCount;
   }
 
   public async findPostById(postId: string): Promise<Post> {
     if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
 
-    const findPost: Post = await this.post.findOne({ _id: postId });
+    const findPost: Post = await this.post.findOne({ _id: postId, active: true });
     if (!findPost) throw new HttpException(409, "Post doesn't exist");
 
     return findPost;
@@ -29,7 +29,7 @@ class PostService {
 
   public async loadPost(oldestPostCreatedAt: any): Promise<Post[]> {
     const posts: Post[] = await this.post
-      .find({ createdAt: { $lt: oldestPostCreatedAt } })
+      .find({ createdAt: { $lt: oldestPostCreatedAt }, active: true })
       .sort({ createdAt: -1 })
       .limit(10);
     return posts;
@@ -37,14 +37,14 @@ class PostService {
 
   public async loadPostByUserId(userId: string, oldestPostCreatedAt: any): Promise<Post[]> {
     const posts: Post[] = await this.post
-      .find({ userId, createdAt: { $lt: oldestPostCreatedAt } })
+      .find({ userId, createdAt: { $lt: oldestPostCreatedAt }, active: true })
       .sort({ createdAt: -1 })
       .limit(10);
     return posts;
   }
 
   public async getAllPostCountByUserId(userId: string): Promise<any> {
-    const postsCount: any = await this.post.count({ userId });
+    const postsCount: any = await this.post.count({ userId, active: true });
     return postsCount;
   }
 
@@ -58,14 +58,14 @@ class PostService {
 
   public async loadPostByUserIdInWishes(userId: string, oldestPostCreatedAt: any): Promise<Post[]> {
     const posts: Post[] = await this.post
-      .find({ createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } } })
+      .find({ createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } }, active: true })
       .sort({ createdAt: -1 })
       .limit(10);
     return posts;
   }
 
   public async getAllPostCountByUserIdInWishes(userId: string): Promise<any> {
-    const postsCount: any = await this.post.count({ wishes: { $elemMatch: { userId } } });
+    const postsCount: any = await this.post.count({ wishes: { $elemMatch: { userId } }, active: true });
     return postsCount;
   }
 
@@ -81,7 +81,7 @@ class PostService {
   public async updateWishPostById(postId: string, postWishData: UpdateWishPostDto): Promise<Post> {
     if (isEmpty(postWishData)) throw new HttpException(400, 'postData is empty');
 
-    const findPost: Post = await this.post.findOne({ _id: postId });
+    const findPost: Post = await this.post.findOne({ _id: postId, active: true });
     if (!findPost) throw new HttpException(409, "Post doesn't exist");
 
     const wishExist: any = findPost.wishes.find(
