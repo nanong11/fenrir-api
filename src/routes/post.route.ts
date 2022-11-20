@@ -21,6 +21,7 @@ class UsersRoute implements Routes {
     this.router.get(`${this.path}/count`, this.postController.getAllPostCount);
     this.router.get(`${this.path}/:id`, this.postController.getPostById);
     this.router.post(`${this.path}/load`, this.postController.loadPost);
+    // this.router.post(`${this.path}/load_from_cache`, this.postController.loadPostFromCache);
     this.router.post(`${this.path}/load_by_userid`, this.postController.loadPostByUserId);
     this.router.post(`${this.path}/count_by_userid`, this.postController.getAllPostCountByUserId);
     this.router.post(`${this.path}/load_by_userid_in_wishes`, this.postController.loadPostByUserIdInWishes);

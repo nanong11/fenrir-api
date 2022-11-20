@@ -7,6 +7,7 @@ import * as AWS from 'aws-sdk';
 import userService from '@services/users.service';
 import { User } from '@interfaces/users.interface';
 import { UpdateWishPostDto } from '@/dtos/wish.dto';
+// import { redisCacheSetEx, redisCacheGet } from '@/utils/redisCache';
 
 class PostController {
   public postService = new PostService();
@@ -143,49 +144,53 @@ class PostController {
                         };
 
                         console.log('LOAD_POST_IMAGE_START');
-                        s3.getObject(params, function (err: any, params: any) {
-                          // console.log(err, params1);
-                          if (params) {
-                            const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
-                            const imageBase64 = `data:${type};base64,${base64}`;
+                        s3.getObject(
+                          params,
+                          /* async  */ function (err: any, params: any) {
+                            // console.log(err, params1);
+                            if (params) {
+                              const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                              const imageBase64 = `data:${type};base64,${base64}`;
 
-                            photos.push({
-                              imageUrl: imageBase64,
-                              type: type,
-                              status: 'success',
-                            });
-
-                            console.log('PHOTOS_LOADED_SUCCESS', photos);
-                          } else {
-                            photos.push({
-                              imageUrl: null,
-                              type: null,
-                              status: 'failed',
-                            });
-
-                            console.log('PHOTOS_LOADED_ERROR', photos);
-                          }
-
-                          // After getting all the photos for each post, push it to the new array
-                          if (photos.length === imageArray.length) {
-                            console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
-                            (post.photos = photos),
-                              rawLoadPostData.push({
-                                ...post,
+                              photos.push({
+                                imageUrl: imageBase64,
+                                type: type,
+                                status: 'success',
                               });
-                          }
 
-                          // After pushing all the post with user and photos, select only the _doc property
-                          if (rawLoadPostData.length === loadPostDataWithUserDetails.length) {
-                            const newLoadPostData = [];
-                            rawLoadPostData.map(post => {
-                              newLoadPostData.push(post._doc);
-                            });
+                              console.log('PHOTOS_LOADED_SUCCESS', photos);
+                            } else {
+                              photos.push({
+                                imageUrl: null,
+                                type: null,
+                                status: 'failed',
+                              });
 
-                            console.log('NEW_LOAD_POST_DATA', newLoadPostData);
-                            res.status(200).json({ data: newLoadPostData, message: 'FindPostLoad' });
-                          }
-                        });
+                              console.log('PHOTOS_LOADED_ERROR', photos);
+                            }
+
+                            // After getting all the photos for each post, push it to the new array
+                            if (photos.length === imageArray.length) {
+                              console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
+                              (post.photos = photos),
+                                rawLoadPostData.push({
+                                  ...post,
+                                });
+                            }
+
+                            // After pushing all the post with user and photos, select only the _doc property
+                            if (rawLoadPostData.length === loadPostDataWithUserDetails.length) {
+                              const newLoadPostData = [];
+                              rawLoadPostData.map(post => {
+                                newLoadPostData.push(post._doc);
+                              });
+
+                              console.log('NEW_LOAD_POST_DATA', newLoadPostData);
+                              // redisCacheSetEx('loadPostFromCacheData', 3600, newLoadPostData);
+                              res.status(200).json({ data: newLoadPostData, message: 'FindPostLoad' });
+                            }
+                          },
+                        );
                       }
                     });
                   });
@@ -239,46 +244,50 @@ class PostController {
                     };
 
                     console.log('LOAD_POST_IMAGE_START');
-                    s3.getObject(params, function (err: any, params: any) {
-                      // console.log(err, params1);
-                      if (params) {
-                        const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
-                        const imageBase64 = `data:${type};base64,${base64}`;
-                        photos.push({
-                          imageUrl: imageBase64,
-                          type: type,
-                          status: 'success',
-                        });
-                        console.log('PHOTOS_LOADED_SUCCESS', photos);
-                      } else {
-                        photos.push({
-                          imageUrl: null,
-                          type: null,
-                          status: 'failed',
-                        });
-                        console.log('PHOTOS_LOADED_ERROR', photos);
-                      }
-
-                      // After getting all the photos for each post, push it to the new array
-                      if (photos.length === imageArray.length) {
-                        console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
-                        (post.photos = photos),
-                          rawLoadPostData.push({
-                            ...post,
+                    s3.getObject(
+                      params,
+                      /* async  */ function (err: any, params: any) {
+                        // console.log(err, params1);
+                        if (params) {
+                          const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
+                          const imageBase64 = `data:${type};base64,${base64}`;
+                          photos.push({
+                            imageUrl: imageBase64,
+                            type: type,
+                            status: 'success',
                           });
-                      }
+                          console.log('PHOTOS_LOADED_SUCCESS', photos);
+                        } else {
+                          photos.push({
+                            imageUrl: null,
+                            type: null,
+                            status: 'failed',
+                          });
+                          console.log('PHOTOS_LOADED_ERROR', photos);
+                        }
 
-                      // After pushing all the post with user and photos, select only the _doc property
-                      if (rawLoadPostData.length === loadPostDataWithUserDetails.length) {
-                        const newLoadPostData = [];
-                        rawLoadPostData.map(post => {
-                          newLoadPostData.push(post._doc);
-                        });
+                        // After getting all the photos for each post, push it to the new array
+                        if (photos.length === imageArray.length) {
+                          console.log('ALL_PHOTOS_LOADED_SUCCESS', photos);
+                          (post.photos = photos),
+                            rawLoadPostData.push({
+                              ...post,
+                            });
+                        }
 
-                        console.log('NEW_LOAD_POST_DATA', newLoadPostData);
-                        res.status(200).json({ data: newLoadPostData, message: 'Load Post Success' });
-                      }
-                    });
+                        // After pushing all the post with user and photos, select only the _doc property
+                        if (rawLoadPostData.length === loadPostDataWithUserDetails.length) {
+                          const newLoadPostData = [];
+                          rawLoadPostData.map(post => {
+                            newLoadPostData.push(post._doc);
+                          });
+
+                          console.log('NEW_LOAD_POST_DATA', newLoadPostData);
+                          // redisCacheSetEx('loadPostFromCacheData', 3600, newLoadPostData);
+                          res.status(200).json({ data: newLoadPostData, message: 'Load Post Success' });
+                        }
+                      },
+                    );
                   }
                 });
               });
@@ -292,6 +301,17 @@ class PostController {
       next(error);
     }
   };
+
+  // public loadPostFromCache = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const key = req.body.key;
+  //     const loadPostFromCache = await redisCacheGet(key)
+
+  //     res.status(200).json({ data: loadPostFromCache, message: 'Load Post From Cache Success' });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
   public loadPostByUserId = async (req: Request, res: Response, next: NextFunction) => {
     try {
