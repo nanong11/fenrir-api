@@ -43,7 +43,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
           Bucket: bucketName,
           Key: uniqueId,
           Body: base64DataWebp,
-          // ACL: 'public-read',
+          ACL: 'public-read',
           ContentEncoding: 'base64',
           ContentType: `image/${type}`,
         };
@@ -56,6 +56,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
               id: params.key,
               type: type,
               status: 'success',
+              imageUrl: `https://${bucketName}.s3.ap-southeast-1.amazonaws.com/${params.key}`,
             });
             console.log('UPLOAD_POST_IMAGE_END_SUCCESS');
             console.log('S3_UPLOAD_PARAMS', params);

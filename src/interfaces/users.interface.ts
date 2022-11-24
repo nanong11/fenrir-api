@@ -14,7 +14,7 @@ export interface User {
     id: string;
     type: string;
     status: string;
-    imageUrl?: string;
+    imageUrl: string;
   };
   about: string;
   verifiedPhone: boolean;
