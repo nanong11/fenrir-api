@@ -10,7 +10,10 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
     if (req.body.photos && req.body.photos.length > 0) {
       const imageUrlArray = req.body.photos;
       const photos = [];
-      imageUrlArray.map(async (imageUrl: string) => {
+      console.log('imageUrlArray', imageUrlArray);
+      imageUrlArray.map(async (image: any) => {
+        const imageUrl = image.url;
+        const imageOrder = image.order;
         const base64Data: any = Buffer.from(imageUrl.replace(/^data:image\/\w+;base64,/, ''), 'base64');
         // const type: string = imageUrl.split(';')[0].split('/')[1];
         const type = 'webp';
@@ -57,6 +60,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
               type: type,
               status: 'success',
               imageUrl: `https://${bucketName}.s3.ap-southeast-1.amazonaws.com/${params.key}`,
+              order: imageOrder,
             });
             console.log('UPLOAD_POST_IMAGE_END_SUCCESS');
             console.log('S3_UPLOAD_PARAMS', params);
@@ -64,6 +68,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
             photos.push({
               id: null,
               type: null,
+              order: null,
               status: 'failed',
             });
             console.log('UPLOAD_POST_IMAGE_END_ERROR');
