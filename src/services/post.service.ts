@@ -31,7 +31,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ createdAt: { $lt: oldestPostCreatedAt }, active: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(3);
     return posts;
   }
 
@@ -39,7 +39,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ userId, createdAt: { $lt: oldestPostCreatedAt }, active: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(3);
     return posts;
   }
 
@@ -60,7 +60,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } }, active: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(3);
     return posts;
   }
 
