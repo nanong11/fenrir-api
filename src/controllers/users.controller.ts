@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { CreateUserDto } from '@dtos/users.dto';
 import { User } from '@interfaces/users.interface';
 import userService from '@services/users.service';
-import { AWS_S3_ACCESS_KEY_ID, AWS_S3_ANDVARI_PROFILE_IMAGES, AWS_S3_REGION, AWS_S3_SECRET_ACCESS_KEY } from '@/config';
-import * as AWS from 'aws-sdk';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { compare } from 'bcrypt';
 
@@ -92,46 +90,6 @@ class UsersController {
       } else {
         res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'wrong old password' });
       }
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public getProfilePhoto = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const imageId: string = req.params.id;
-      const imageType = 'webp';
-      const bucketName: string = AWS_S3_ANDVARI_PROFILE_IMAGES;
-      const region: string = AWS_S3_REGION;
-      const accessKeyId: string = AWS_S3_ACCESS_KEY_ID;
-      const secretAccessKey: string = AWS_S3_SECRET_ACCESS_KEY;
-
-      AWS.config.update({
-        region,
-        accessKeyId,
-        secretAccessKey,
-      });
-
-      const s3 = new AWS.S3();
-      const params = {
-        Bucket: bucketName,
-        Key: imageId,
-      };
-
-      console.log('LOAD_PROFILE_IMAGE_START');
-      s3.getObject(params, function (err: any, params: any) {
-        // console.log(err, params1);
-        if (params) {
-          const base64: any = Buffer.from(params.Body, 'base64').toString('base64');
-          const imageBase64 = `data:${imageType};base64,${base64}`;
-
-          console.log('LOAD_PROFILE_IMAGE_END_SUCCESS');
-          res.status(200).json({ data: imageBase64, message: 'Load Image Success' });
-        } else {
-          console.log('LOAD_PROFILE_IMAGE_END_ERROR');
-          res.status(401).json({ data: err, message: 'Load Image Failed' });
-        }
-      });
     } catch (error) {
       next(error);
     }

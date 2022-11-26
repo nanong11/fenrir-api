@@ -33,7 +33,6 @@ class UsersRoute implements Routes {
       validationMiddleware(CreateUserDto, 'body', true),
       this.usersController.checkOldPassword,
     );
-    this.router.get(`${this.path}/get_profile_photo/:id`, this.usersController.getProfilePhoto);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
   }
 }
