@@ -59,7 +59,7 @@ const uploadPostImageMiddleware = async (req: Request, res: Response, next: Next
               id: params.key,
               type: type,
               status: 'success',
-              imageUrl: `https://${bucketName}.s3.ap-southeast-1.amazonaws.com/${params.key}`,
+              imageUrl: `https://${bucketName}.s3.${region}.amazonaws.com/${params.key}`,
               order: imageOrder,
             });
             console.log('UPLOAD_POST_IMAGE_END_SUCCESS');

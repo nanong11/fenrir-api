@@ -54,7 +54,7 @@ const uploadProfileImageMiddleware = async (req: Request, res: Response, next: N
             id: params.key,
             type: type,
             status: 'success',
-            imageUrl: `https://${bucketName}.s3.ap-southeast-1.amazonaws.com/${params.key}`,
+            imageUrl: `https://${bucketName}.s3.${region}.amazonaws.com/${params.key}`,
           };
           console.log('UPLOAD_PROFILE_IMAGE_END');
           next();
