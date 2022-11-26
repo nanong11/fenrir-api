@@ -4,6 +4,8 @@ import { User } from '@interfaces/users.interface';
 import userService from '@services/users.service';
 import { AWS_S3_ACCESS_KEY_ID, AWS_S3_ANDVARI_PROFILE_IMAGES, AWS_S3_REGION, AWS_S3_SECRET_ACCESS_KEY } from '@/config';
 import * as AWS from 'aws-sdk';
+import { RequestWithUser } from '@/interfaces/auth.interface';
+import { compare } from 'bcrypt';
 
 class UsersController {
   public userService = new userService();
@@ -73,6 +75,22 @@ class UsersController {
         } else {
           res.status(200).json({ isEmailExist: isEmailExist, message: `${userEmail} not in database.` });
         }
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public checkOldPassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const userDataFromReqBody: CreateUserDto = req.body;
+      const userDataFromAuthMiddleware: User = req.user;
+      const isPasswordMatching: boolean = await compare(userDataFromReqBody.password, userDataFromAuthMiddleware.password);
+
+      if (isPasswordMatching) {
+        res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'validated old password' });
+      } else {
+        res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'wrong old password' });
       }
     } catch (error) {
       next(error);
