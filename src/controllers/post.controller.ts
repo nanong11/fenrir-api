@@ -66,8 +66,8 @@ class PostController {
 
   public loadPostByUserId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.body.userId;
-      const oldestPostCreatedAt = req.body.date;
+      const userId: string = req.body.userId;
+      const oldestPostCreatedAt: any = req.body.date;
       const loadPostData: Post[] = await this.postService.loadPostByUserId(userId, oldestPostCreatedAt);
 
       res.status(200).json({ data: loadPostData, message: 'Load Post Success' });
@@ -78,7 +78,7 @@ class PostController {
 
   public getAllPostCountByUserId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.body.userId;
+      const userId: string = req.body.userId;
       const getAllPostCountByUserId: any = await this.postService.getAllPostCountByUserId(userId);
 
       res.status(200).json({ data: getAllPostCountByUserId, message: 'getAllPostCountByUserId' });
@@ -89,7 +89,7 @@ class PostController {
 
   public loadPostByUserIdInWishes = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.body.userId;
+      const userId: string = req.body.userId;
       const oldestPostCreatedAt = req.body.date;
       const loadPostData: Post[] = await this.postService.loadPostByUserIdInWishes(userId, oldestPostCreatedAt);
 
@@ -101,7 +101,7 @@ class PostController {
 
   public getAllPostCountByUserIdInWishes = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.body.userId;
+      const userId: string = req.body.userId;
       const getAllPostCountByUserIdInWishes: any = await this.postService.getAllPostCountByUserIdInWishes(userId);
 
       res.status(200).json({ data: getAllPostCountByUserIdInWishes, message: 'getAllPostCountByUserIdInWishes' });
@@ -151,8 +151,8 @@ class PostController {
 
   public searchPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const oldestPostCreatedAt = req.body.date;
-      const keyWord = req.body.keyWord;
+      const oldestPostCreatedAt: any = req.body.date;
+      const keyWord: string = req.body.keyWord;
       const searchPostData: Post[] = await this.postService.searchPost(oldestPostCreatedAt, keyWord);
 
       res.status(200).json({ data: searchPostData, message: 'Search Post Success' });
@@ -163,10 +163,35 @@ class PostController {
 
   public getAllSearchPostCount = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const keyWord = req.body.keyWord;
+      const keyWord: string = req.body.keyWord;
       const getAllSearchPostCount: any = await this.postService.getAllSearchPostCount(keyWord);
 
       res.status(200).json({ data: getAllSearchPostCount, message: 'getAllSearchPostCount' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public searchPostByUserId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.body.userId;
+      const oldestPostCreatedAt: any = req.body.date;
+      const keyWord: string = req.body.keyWord;
+      const searchPostByUserId: Post[] = await this.postService.searchPostByUserId(oldestPostCreatedAt, keyWord, userId);
+
+      res.status(200).json({ data: searchPostByUserId, message: 'Search Post By UserId Success' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllSearchPostCountByUserId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.body.userId;
+      const keyWord: string = req.body.keyWord;
+      const getAllSearchPostCountByUserId: any = await this.postService.getAllSearchPostCountByUserId(keyWord, userId);
+
+      res.status(200).json({ data: getAllSearchPostCountByUserId, message: 'getAllSearchPostCountByUserId' });
     } catch (error) {
       next(error);
     }

@@ -42,6 +42,8 @@ class UsersRoute implements Routes {
     );
     this.router.post(`${this.path}/search`, this.postController.searchPost);
     this.router.post(`${this.path}/search_count`, this.postController.getAllSearchPostCount);
+    this.router.post(`${this.path}/search_by_userId`, this.postController.searchPostByUserId);
+    this.router.post(`${this.path}/search_count_by_userId`, this.postController.getAllSearchPostCountByUserId);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.postController.deletePost);
   }
 }
