@@ -105,16 +105,16 @@ class PostService {
         createdAt: { $lt: oldestPostCreatedAt },
         active: true,
         $or: [
+          { title: { $regex: keyWord, $options: 'i' } },
+          { description: { $regex: keyWord, $options: 'i' } },
+          { category: { $regex: keyWord, $options: 'i' } },
           { 'user.firstName': { $regex: keyWord, $options: 'i' } },
           { 'user.lastName': { $regex: keyWord, $options: 'i' } },
-          { 'user.about': { $regex: keyWord, $options: 'i' } },
+          // { 'user.about': { $regex: keyWord, $options: 'i' } },
           { 'user.address.street': { $regex: keyWord, $options: 'i' } },
           { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
           { 'user.address.city': { $regex: keyWord, $options: 'i' } },
           { 'user.address.province': { $regex: keyWord, $options: 'i' } },
-          { title: { $regex: keyWord, $options: 'i' } },
-          { description: { $regex: keyWord, $options: 'i' } },
-          { category: { $regex: keyWord, $options: 'i' } },
         ],
       })
       .sort({ createdAt: -1 })
@@ -126,16 +126,16 @@ class PostService {
     const searchPostsCount: any = await this.post.count({
       active: true,
       $or: [
+        { title: { $regex: keyWord, $options: 'i' } },
+        { description: { $regex: keyWord, $options: 'i' } },
+        { category: { $regex: keyWord, $options: 'i' } },
         { 'user.firstName': { $regex: keyWord, $options: 'i' } },
         { 'user.lastName': { $regex: keyWord, $options: 'i' } },
-        { 'user.about': { $regex: keyWord, $options: 'i' } },
+        // { 'user.about': { $regex: keyWord, $options: 'i' } },
         { 'user.address.street': { $regex: keyWord, $options: 'i' } },
         { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
         { 'user.address.city': { $regex: keyWord, $options: 'i' } },
         { 'user.address.province': { $regex: keyWord, $options: 'i' } },
-        { title: { $regex: keyWord, $options: 'i' } },
-        { description: { $regex: keyWord, $options: 'i' } },
-        { category: { $regex: keyWord, $options: 'i' } },
       ],
     });
     return searchPostsCount;
