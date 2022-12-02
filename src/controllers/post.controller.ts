@@ -197,6 +197,31 @@ class PostController {
     }
   };
 
+  public searchPostByUserIdInWishes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.body.userId;
+      const oldestPostCreatedAt: any = req.body.date;
+      const keyWord: string = req.body.keyWord;
+      const searchPostByUserIdInWishes: Post[] = await this.postService.searchPostByUserIdInWishes(oldestPostCreatedAt, keyWord, userId);
+
+      res.status(200).json({ data: searchPostByUserIdInWishes, message: 'Search Post By UserId In Wishes Success' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllSearchPostCountByUserIdInWishes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.body.userId;
+      const keyWord: string = req.body.keyWord;
+      const getAllSearchPostCountByUserIdInWishes: any = await this.postService.getAllSearchPostCountByUserIdInWishes(keyWord, userId);
+
+      res.status(200).json({ data: getAllSearchPostCountByUserIdInWishes, message: 'getAllSearchPostCountByUserIdInWishes' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public deletePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const postId: string = req.params.id;

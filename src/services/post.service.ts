@@ -185,6 +185,50 @@ class PostService {
     return searchPostsCount;
   }
 
+  public async searchPostByUserIdInWishes(oldestPostCreatedAt: any, keyWord: string, userId: string): Promise<Post[]> {
+    const posts: Post[] = await this.post
+      .find({
+        wishes: { $elemMatch: { userId } },
+        createdAt: { $lt: oldestPostCreatedAt },
+        active: true,
+        $or: [
+          { title: { $regex: keyWord, $options: 'i' } },
+          { description: { $regex: keyWord, $options: 'i' } },
+          { category: { $regex: keyWord, $options: 'i' } },
+          { 'user.firstName': { $regex: keyWord, $options: 'i' } },
+          { 'user.lastName': { $regex: keyWord, $options: 'i' } },
+          // { 'user.about': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.street': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.city': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.province': { $regex: keyWord, $options: 'i' } },
+        ],
+      })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    return posts;
+  }
+
+  public async getAllSearchPostCountByUserIdInWishes(keyWord: string, userId: string): Promise<any> {
+    const searchPostsCount: any = await this.post.count({
+      wishes: { $elemMatch: { userId } },
+      active: true,
+      $or: [
+        { title: { $regex: keyWord, $options: 'i' } },
+        { description: { $regex: keyWord, $options: 'i' } },
+        { category: { $regex: keyWord, $options: 'i' } },
+        { 'user.firstName': { $regex: keyWord, $options: 'i' } },
+        { 'user.lastName': { $regex: keyWord, $options: 'i' } },
+        // { 'user.about': { $regex: keyWord, $options: 'i' } },
+        { 'user.address.street': { $regex: keyWord, $options: 'i' } },
+        { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
+        { 'user.address.city': { $regex: keyWord, $options: 'i' } },
+        { 'user.address.province': { $regex: keyWord, $options: 'i' } },
+      ],
+    });
+    return searchPostsCount;
+  }
+
   public async deletePost(postId: string): Promise<Post> {
     const deletePostById: Post = await this.post.findByIdAndDelete(postId);
     if (!deletePostById) throw new HttpException(409, "Post doesn't exist");
