@@ -149,6 +149,29 @@ class PostController {
     }
   };
 
+  public searchPost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const oldestPostCreatedAt = req.body.date;
+      const keyWord = req.body.keyWord;
+      const searchPostData: Post[] = await this.postService.searchPost(oldestPostCreatedAt, keyWord);
+
+      res.status(200).json({ data: searchPostData, message: 'Search Post Success' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllSearchPostCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const keyWord = req.body.keyWord;
+      const getAllSearchPostCount: any = await this.postService.getAllSearchPostCount(keyWord);
+
+      res.status(200).json({ data: getAllSearchPostCount, message: 'getAllSearchPostCount' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public deletePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const postId: string = req.params.id;

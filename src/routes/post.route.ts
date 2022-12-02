@@ -40,6 +40,8 @@ class UsersRoute implements Routes {
       validationMiddleware(UpdateWishPostDto, 'body'),
       this.postController.updateWishPostById,
     );
+    this.router.post(`${this.path}/search`, this.postController.searchPost);
+    this.router.post(`${this.path}/search_count`, this.postController.getAllSearchPostCount);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.postController.deletePost);
   }
 }
