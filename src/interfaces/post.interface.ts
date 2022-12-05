@@ -10,3 +10,8 @@ export interface Post {
   wishes: Array<object>;
   active: Boolean;
 }
+
+export interface SearchPostData {
+  post: Array<object>;
+  postCount: number;
+}

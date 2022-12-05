@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { CreatePostDto } from '@/dtos/post.dto';
-import { Post } from '@/interfaces/post.interface';
+import { CreatePostDto, UpdateWishPostDto, SearchPostDto } from '@/dtos/post.dto';
+import { Post, SearchPostData } from '@/interfaces/post.interface';
 import PostService from '@/services/post.service';
 import userService from '@services/users.service';
 import { User } from '@interfaces/users.interface';
-import { UpdateWishPostDto } from '@/dtos/wish.dto';
 // import { redisCacheSetEx, redisCacheGet } from '@/utils/redisCache';
 
 class PostController {
@@ -151,72 +150,10 @@ class PostController {
 
   public searchPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const oldestPostCreatedAt: any = req.body.date;
-      const keyWord: string = req.body.keyWord;
-      const searchPostData: Post[] = await this.postService.searchPost(oldestPostCreatedAt, keyWord);
+      const searchPostDetails: SearchPostDto = req.body;
+      const searchPostData: SearchPostData = await this.postService.searchPost(searchPostDetails);
 
       res.status(200).json({ data: searchPostData, message: 'Search Post Success' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public getAllSearchPostCount = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const keyWord: string = req.body.keyWord;
-      const getAllSearchPostCount: any = await this.postService.getAllSearchPostCount(keyWord);
-
-      res.status(200).json({ data: getAllSearchPostCount, message: 'getAllSearchPostCount' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public searchPostByUserId = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.body.userId;
-      const oldestPostCreatedAt: any = req.body.date;
-      const keyWord: string = req.body.keyWord;
-      const searchPostByUserId: Post[] = await this.postService.searchPostByUserId(oldestPostCreatedAt, keyWord, userId);
-
-      res.status(200).json({ data: searchPostByUserId, message: 'Search Post By UserId Success' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public getAllSearchPostCountByUserId = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.body.userId;
-      const keyWord: string = req.body.keyWord;
-      const getAllSearchPostCountByUserId: any = await this.postService.getAllSearchPostCountByUserId(keyWord, userId);
-
-      res.status(200).json({ data: getAllSearchPostCountByUserId, message: 'getAllSearchPostCountByUserId' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public searchPostByUserIdInWishes = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.body.userId;
-      const oldestPostCreatedAt: any = req.body.date;
-      const keyWord: string = req.body.keyWord;
-      const searchPostByUserIdInWishes: Post[] = await this.postService.searchPostByUserIdInWishes(oldestPostCreatedAt, keyWord, userId);
-
-      res.status(200).json({ data: searchPostByUserIdInWishes, message: 'Search Post By UserId In Wishes Success' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public getAllSearchPostCountByUserIdInWishes = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.body.userId;
-      const keyWord: string = req.body.keyWord;
-      const getAllSearchPostCountByUserIdInWishes: any = await this.postService.getAllSearchPostCountByUserIdInWishes(keyWord, userId);
-
-      res.status(200).json({ data: getAllSearchPostCountByUserIdInWishes, message: 'getAllSearchPostCountByUserIdInWishes' });
     } catch (error) {
       next(error);
     }

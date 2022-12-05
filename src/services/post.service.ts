@@ -1,9 +1,8 @@
-import { CreatePostDto } from '@/dtos/post.dto';
+import { CreatePostDto, UpdateWishPostDto, SearchPostDto } from '@/dtos/post.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { Post } from '@/interfaces/post.interface';
+import { Post, SearchPostData } from '@/interfaces/post.interface';
 import postModel from '@/models/post.model';
 import { isEmpty } from '@utils/util';
-import { UpdateWishPostDto } from '@/dtos/wish.dto';
 
 class PostService {
   public post = postModel;
@@ -31,7 +30,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ createdAt: { $lt: oldestPostCreatedAt }, active: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(1);
     return posts;
   }
 
@@ -39,7 +38,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ userId, createdAt: { $lt: oldestPostCreatedAt }, active: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(1);
     return posts;
   }
 
@@ -60,7 +59,7 @@ class PostService {
     const posts: Post[] = await this.post
       .find({ createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } }, active: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(1);
     return posts;
   }
 
@@ -99,10 +98,16 @@ class PostService {
     }
   }
 
-  public async searchPost(oldestPostCreatedAt: any, keyWord: string): Promise<Post[]> {
-    const posts: Post[] = await this.post
-      .find({
+  public async searchPost(searchPostDetails: SearchPostDto): Promise<SearchPostData> {
+    if (isEmpty(searchPostDetails)) throw new HttpException(400, 'searchPostDetails is empty');
+
+    const { userId, oldestPostCreatedAt, keyWord, inWishlist } = searchPostDetails;
+    let findPostOptions: object = {};
+    let findPostCountOptions: object = {};
+    if (userId && inWishlist) {
+      findPostOptions = {
         createdAt: { $lt: oldestPostCreatedAt },
+        wishes: { $elemMatch: { userId } },
         active: true,
         $or: [
           { title: { $regex: keyWord, $options: 'i' } },
@@ -116,34 +121,25 @@ class PostService {
           { 'user.address.city': { $regex: keyWord, $options: 'i' } },
           { 'user.address.province': { $regex: keyWord, $options: 'i' } },
         ],
-      })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    return posts;
-  }
-
-  public async getAllSearchPostCount(keyWord: string): Promise<any> {
-    const searchPostsCount: any = await this.post.count({
-      active: true,
-      $or: [
-        { title: { $regex: keyWord, $options: 'i' } },
-        { description: { $regex: keyWord, $options: 'i' } },
-        { category: { $regex: keyWord, $options: 'i' } },
-        { 'user.firstName': { $regex: keyWord, $options: 'i' } },
-        { 'user.lastName': { $regex: keyWord, $options: 'i' } },
-        // { 'user.about': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.street': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.city': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.province': { $regex: keyWord, $options: 'i' } },
-      ],
-    });
-    return searchPostsCount;
-  }
-
-  public async searchPostByUserId(oldestPostCreatedAt: any, keyWord: string, userId: string): Promise<Post[]> {
-    const posts: Post[] = await this.post
-      .find({
+      };
+      findPostCountOptions = {
+        wishes: { $elemMatch: { userId } },
+        active: true,
+        $or: [
+          { title: { $regex: keyWord, $options: 'i' } },
+          { description: { $regex: keyWord, $options: 'i' } },
+          { category: { $regex: keyWord, $options: 'i' } },
+          { 'user.firstName': { $regex: keyWord, $options: 'i' } },
+          { 'user.lastName': { $regex: keyWord, $options: 'i' } },
+          // { 'user.about': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.street': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.city': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.province': { $regex: keyWord, $options: 'i' } },
+        ],
+      };
+    } else if (userId) {
+      findPostOptions = {
         userId,
         createdAt: { $lt: oldestPostCreatedAt },
         active: true,
@@ -159,36 +155,25 @@ class PostService {
           { 'user.address.city': { $regex: keyWord, $options: 'i' } },
           { 'user.address.province': { $regex: keyWord, $options: 'i' } },
         ],
-      })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    return posts;
-  }
-
-  public async getAllSearchPostCountByUserId(keyWord: string, userId: string): Promise<any> {
-    const searchPostsCount: any = await this.post.count({
-      userId,
-      active: true,
-      $or: [
-        { title: { $regex: keyWord, $options: 'i' } },
-        { description: { $regex: keyWord, $options: 'i' } },
-        { category: { $regex: keyWord, $options: 'i' } },
-        { 'user.firstName': { $regex: keyWord, $options: 'i' } },
-        { 'user.lastName': { $regex: keyWord, $options: 'i' } },
-        // { 'user.about': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.street': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.city': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.province': { $regex: keyWord, $options: 'i' } },
-      ],
-    });
-    return searchPostsCount;
-  }
-
-  public async searchPostByUserIdInWishes(oldestPostCreatedAt: any, keyWord: string, userId: string): Promise<Post[]> {
-    const posts: Post[] = await this.post
-      .find({
-        wishes: { $elemMatch: { userId } },
+      };
+      findPostCountOptions = {
+        userId,
+        active: true,
+        $or: [
+          { title: { $regex: keyWord, $options: 'i' } },
+          { description: { $regex: keyWord, $options: 'i' } },
+          { category: { $regex: keyWord, $options: 'i' } },
+          { 'user.firstName': { $regex: keyWord, $options: 'i' } },
+          { 'user.lastName': { $regex: keyWord, $options: 'i' } },
+          // { 'user.about': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.street': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.city': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.province': { $regex: keyWord, $options: 'i' } },
+        ],
+      };
+    } else {
+      findPostOptions = {
         createdAt: { $lt: oldestPostCreatedAt },
         active: true,
         $or: [
@@ -203,30 +188,28 @@ class PostService {
           { 'user.address.city': { $regex: keyWord, $options: 'i' } },
           { 'user.address.province': { $regex: keyWord, $options: 'i' } },
         ],
-      })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    return posts;
-  }
+      };
+      findPostCountOptions = {
+        active: true,
+        $or: [
+          { title: { $regex: keyWord, $options: 'i' } },
+          { description: { $regex: keyWord, $options: 'i' } },
+          { category: { $regex: keyWord, $options: 'i' } },
+          { 'user.firstName': { $regex: keyWord, $options: 'i' } },
+          { 'user.lastName': { $regex: keyWord, $options: 'i' } },
+          // { 'user.about': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.street': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.city': { $regex: keyWord, $options: 'i' } },
+          { 'user.address.province': { $regex: keyWord, $options: 'i' } },
+        ],
+      };
+    }
 
-  public async getAllSearchPostCountByUserIdInWishes(keyWord: string, userId: string): Promise<any> {
-    const searchPostsCount: any = await this.post.count({
-      wishes: { $elemMatch: { userId } },
-      active: true,
-      $or: [
-        { title: { $regex: keyWord, $options: 'i' } },
-        { description: { $regex: keyWord, $options: 'i' } },
-        { category: { $regex: keyWord, $options: 'i' } },
-        { 'user.firstName': { $regex: keyWord, $options: 'i' } },
-        { 'user.lastName': { $regex: keyWord, $options: 'i' } },
-        // { 'user.about': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.street': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.brgy': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.city': { $regex: keyWord, $options: 'i' } },
-        { 'user.address.province': { $regex: keyWord, $options: 'i' } },
-      ],
-    });
-    return searchPostsCount;
+    const post: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
+    const postCount: number = await this.post.count(findPostCountOptions);
+
+    return { post, postCount };
   }
 
   public async deletePost(postId: string): Promise<Post> {
