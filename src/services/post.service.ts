@@ -1,51 +1,11 @@
-import { CreatePostDto, UpdateWishPostDto, SearchPostDto } from '@/dtos/post.dto';
+import { CreatePostDto, UpdatePostDto, UpdateWishPostDto, LoadPostDto, SearchPostDto } from '@/dtos/post.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { Post, SearchPostData } from '@/interfaces/post.interface';
+import { Post, LoadPostData, SearchPostData } from '@/interfaces/post.interface';
 import postModel from '@/models/post.model';
 import { isEmpty } from '@utils/util';
 
 class PostService {
   public post = postModel;
-
-  public async findAllPost(): Promise<Post[]> {
-    const posts: Post[] = await this.post.find();
-    return posts;
-  }
-
-  public async findAllPostCount(): Promise<any> {
-    const postsCount: any = await this.post.count({ active: true });
-    return postsCount;
-  }
-
-  public async findPostById(postId: string): Promise<Post> {
-    if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
-
-    const findPost: Post = await this.post.findOne({ _id: postId, active: true });
-    if (!findPost) throw new HttpException(409, "Post doesn't exist");
-
-    return findPost;
-  }
-
-  public async loadPost(oldestPostCreatedAt: any): Promise<Post[]> {
-    const posts: Post[] = await this.post
-      .find({ createdAt: { $lt: oldestPostCreatedAt }, active: true })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    return posts;
-  }
-
-  public async loadPostByUserId(userId: string, oldestPostCreatedAt: any): Promise<Post[]> {
-    const posts: Post[] = await this.post
-      .find({ userId, createdAt: { $lt: oldestPostCreatedAt }, active: true })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    return posts;
-  }
-
-  public async getAllPostCountByUserId(userId: string): Promise<any> {
-    const postsCount: any = await this.post.count({ userId, active: true });
-    return postsCount;
-  }
 
   public async createPost(postData: CreatePostDto): Promise<Post> {
     if (isEmpty(postData)) throw new HttpException(400, 'postData is empty');
@@ -55,20 +15,8 @@ class PostService {
     return createPostData;
   }
 
-  public async loadPostByUserIdInWishes(userId: string, oldestPostCreatedAt: any): Promise<Post[]> {
-    const posts: Post[] = await this.post
-      .find({ createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } }, active: true })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    return posts;
-  }
-
-  public async getAllPostCountByUserIdInWishes(userId: string): Promise<any> {
-    const postsCount: any = await this.post.count({ wishes: { $elemMatch: { userId } }, active: true });
-    return postsCount;
-  }
-
-  public async updatePost(postId: string, postData: CreatePostDto): Promise<Post> {
+  public async updatePost(postId: string, postData: UpdatePostDto): Promise<Post> {
+    if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
     if (isEmpty(postData)) throw new HttpException(400, 'postData is empty');
 
     const updatePostById: Post = await this.post.findByIdAndUpdate(postId, postData, { new: true });
@@ -78,6 +26,7 @@ class PostService {
   }
 
   public async updateWishPostById(postId: string, postWishData: UpdateWishPostDto): Promise<Post> {
+    if (isEmpty(postId)) throw new HttpException(400, 'postId is empty');
     if (isEmpty(postWishData)) throw new HttpException(400, 'postData is empty');
 
     const findPost: Post = await this.post.findOne({ _id: postId, active: true });
@@ -96,6 +45,30 @@ class PostService {
 
       return updateWishPostById;
     }
+  }
+
+  public async loadPost(loadPostDetails: LoadPostDto): Promise<LoadPostData> {
+    if (isEmpty(loadPostDetails)) throw new HttpException(400, 'loadPostDetails is empty');
+
+    const { userId, oldestPostCreatedAt, inWishlist } = loadPostDetails;
+    let findPostOptions: object = {};
+    let findPostCountOptions: object = {};
+
+    if (userId && inWishlist) {
+      findPostOptions = { createdAt: { $lt: oldestPostCreatedAt }, wishes: { $elemMatch: { userId } }, active: true };
+      findPostCountOptions = { wishes: { $elemMatch: { userId } }, active: true };
+    } else if (userId) {
+      findPostOptions = { userId, createdAt: { $lt: oldestPostCreatedAt }, active: true };
+      findPostCountOptions = { userId, active: true };
+    } else {
+      findPostOptions = { createdAt: { $lt: oldestPostCreatedAt }, active: true };
+      findPostCountOptions = { active: true };
+    }
+
+    const post: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
+    const postCount: number = await this.post.count(findPostCountOptions);
+
+    return { post, postCount };
   }
 
   public async searchPost(searchPostDetails: SearchPostDto): Promise<SearchPostData> {

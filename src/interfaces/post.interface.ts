@@ -11,6 +11,11 @@ export interface Post {
   active: Boolean;
 }
 
+export interface LoadPostData {
+  post: Array<object>;
+  postCount: number;
+}
+
 export interface SearchPostData {
   post: Array<object>;
   postCount: number;
