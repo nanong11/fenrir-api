@@ -2,50 +2,24 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Province } from '@/interfaces/province.interface';
 import provinceModel from '@/models/province.model';
-import { CreateProvinceDto } from '@dtos/province.dto';
+// import { CreateProvinceDto } from '@dtos/province.dto';
 
 class ProvinceService {
   public province = provinceModel;
 
-  public async findAllProvince(): Promise<Province[]> {
-    const province: Province[] = await this.province.find();
-    return province;
-  }
+  // public async findAllProvince(): Promise<Province[]> {
+  //   const province: Province[] = await this.province.find();
+  //   return province;
+  // }
 
-  public async findProvinceById(provinceId: string): Promise<Province> {
-    if (isEmpty(provinceId)) throw new HttpException(400, 'ProvinceId is empty');
+  // public async findProvinceById(provinceId: string): Promise<Province> {
+  //   if (isEmpty(provinceId)) throw new HttpException(400, 'ProvinceId is empty');
 
-    const findOneProvince: Province = await this.province.findOne({ _id: provinceId });
-    if (!findOneProvince) throw new HttpException(409, "Province doesn't exist");
+  //   const findOneProvince: Province = await this.province.findOne({ _id: provinceId });
+  //   if (!findOneProvince) throw new HttpException(409, "Province doesn't exist");
 
-    return findOneProvince;
-  }
-
-  public async createProvince(province: CreateProvinceDto): Promise<Province> {
-    if (isEmpty(province)) throw new HttpException(400, 'Province is empty');
-
-    const findOneProvince: Province[] = await this.province.find({ brgy: province.brgy });
-    if (findOneProvince) {
-      findOneProvince.map(provinceInDb => {
-        if (provinceInDb.province === province.province && provinceInDb.city === province.city) {
-          throw new HttpException(409, `This brgy ${province.brgy} already exists`);
-        }
-      });
-    }
-
-    const createProvince: Province = await this.province.create({ ...province });
-
-    return createProvince;
-  }
-
-  public async updateProvince(provinceId: string, province: CreateProvinceDto): Promise<Province> {
-    if (isEmpty(province)) throw new HttpException(400, 'Province is empty');
-
-    const updateProvinceById: Province = await this.province.findByIdAndUpdate(provinceId, province, { new: true });
-    if (!updateProvinceById) throw new HttpException(409, "Province doesn't exist");
-
-    return updateProvinceById;
-  }
+  //   return findOneProvince;
+  // }
 
   public async findAllProvinceOnly(): Promise<Province[]> {
     const findAllProvinceOnly: Province[] = await this.province.aggregate([
@@ -59,6 +33,8 @@ class ProvinceService {
   }
 
   public async findAllCityOnly(province: string): Promise<Province[]> {
+    if (isEmpty(province)) throw new HttpException(400, 'province is empty');
+
     const findAllProvinceOnly: Province[] = await this.province.aggregate([
       { $match: { province: province } },
       {
@@ -71,6 +47,8 @@ class ProvinceService {
   }
 
   public async findAllBrgyOnly(city: string): Promise<Province[]> {
+    if (isEmpty(city)) throw new HttpException(400, 'city is empty');
+
     const findAllProvinceOnly: Province[] = await this.province.aggregate([
       { $match: { city: city } },
       {
@@ -82,12 +60,38 @@ class ProvinceService {
     return findAllProvinceOnly;
   }
 
-  public async deleteProvince(provinceId: string): Promise<Province> {
-    const deleteProvinceById: Province = await this.province.findByIdAndDelete(provinceId);
-    if (!deleteProvinceById) throw new HttpException(409, "Province doesn't exist");
+  // public async createProvince(province: CreateProvinceDto): Promise<Province> {
+  //   if (isEmpty(province)) throw new HttpException(400, 'Province is empty');
 
-    return deleteProvinceById;
-  }
+  //   const findOneProvince: Province[] = await this.province.find({ brgy: province.brgy });
+  //   if (findOneProvince) {
+  //     findOneProvince.map(provinceInDb => {
+  //       if (provinceInDb.province === province.province && provinceInDb.city === province.city) {
+  //         throw new HttpException(409, `This brgy ${province.brgy} already exists`);
+  //       }
+  //     });
+  //   }
+
+  //   const createProvince: Province = await this.province.create({ ...province });
+
+  //   return createProvince;
+  // }
+
+  // public async updateProvince(provinceId: string, province: CreateProvinceDto): Promise<Province> {
+  //   if (isEmpty(province)) throw new HttpException(400, 'Province is empty');
+
+  //   const updateProvinceById: Province = await this.province.findByIdAndUpdate(provinceId, province, { new: true });
+  //   if (!updateProvinceById) throw new HttpException(409, "Province doesn't exist");
+
+  //   return updateProvinceById;
+  // }
+
+  // public async deleteProvince(provinceId: string): Promise<Province> {
+  //   const deleteProvinceById: Province = await this.province.findByIdAndDelete(provinceId);
+  //   if (!deleteProvinceById) throw new HttpException(409, "Province doesn't exist");
+
+  //   return deleteProvinceById;
+  // }
 }
 
 export default ProvinceService;

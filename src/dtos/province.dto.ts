@@ -13,3 +13,13 @@ export class CreateProvinceDto {
   @IsString()
   public region: string;
 }
+
+export class FindCityDto {
+  @IsString()
+  public province: string;
+}
+
+export class FindBrgyDto {
+  @IsString()
+  public city: string;
+}
