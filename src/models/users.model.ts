@@ -3,6 +3,11 @@ import { User } from '@interfaces/users.interface';
 
 const userSchema: Schema = new Schema(
   {
+    mobile: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
     email: {
       type: String,
       required: true,
@@ -12,11 +17,6 @@ const userSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    mobile: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
     firstName: {
       type: String,
       required: true,
@@ -25,21 +25,25 @@ const userSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    address: {
-      type: Object,
-      required: true,
-    },
     birthday: {
       type: String,
       required: true,
     },
+    address: {
+      type: Object,
+      required: true,
+    },
     role: {
       type: String,
+      default: 'user',
+    },
+    verifiedPhone: {
+      type: Boolean,
       required: true,
     },
     isActive: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     socialMedia: {
       type: Object,
@@ -52,10 +56,6 @@ const userSchema: Schema = new Schema(
     about: {
       type: String,
       default: null,
-    },
-    verifiedPhone: {
-      type: Boolean,
-      default: false,
     },
     verifiedUser: {
       type: Boolean,

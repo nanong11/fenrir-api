@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CreateUserDto } from '@dtos/users.dto';
+import { CreateUserDto, UpdateUserDto, PasswordDto } from '@dtos/users.dto';
 import { User } from '@interfaces/users.interface';
 import userService from '@services/users.service';
 import { RequestWithUser } from '@/interfaces/auth.interface';
@@ -8,22 +8,22 @@ import { compare } from 'bcrypt';
 class UsersController {
   public userService = new userService();
 
-  public getUsers = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const findAllUsersData: User[] = await this.userService.findAllUser();
+  // public getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const findAllUsersData: User[] = await this.userService.findAllUser();
 
-      res.status(200).json({ data: findAllUsersData, message: 'findAll' });
-    } catch (error) {
-      next(error);
-    }
-  };
+  //     res.status(200).json({ data: findAllUsersData, message: 'findAll' });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
   public getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId: string = req.params.id;
-      const findOneUserData: User = await this.userService.findUserById(userId);
+      const findOneUserData: User = await this.userService.getUserById(userId);
 
-      res.status(200).json({ data: findOneUserData, message: 'findOne' });
+      res.status(200).json({ data: findOneUserData, message: 'findOne Successful' });
     } catch (error) {
       next(error);
     }
@@ -34,19 +34,35 @@ class UsersController {
       const userData: CreateUserDto = req.body;
       const createUserData: User = await this.userService.createUser(userData);
 
-      res.status(201).json({ data: createUserData, message: 'created' });
+      res.status(201).json({ data: createUserData, message: 'createUser Successful' });
     } catch (error) {
       next(error);
     }
   };
 
-  public updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  public updateUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const userId: string = req.params.id;
-      const userData: CreateUserDto = req.body;
+      const userData: UpdateUserDto = req.body;
       const updateUserData: User = await this.userService.updateUser(userId, userData);
 
-      res.status(200).json({ data: updateUserData, message: 'updated' });
+      res.status(200).json({ data: updateUserData, message: 'updateUser Successful' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public checkOldPassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const userDataFromReqBody: PasswordDto = req.body;
+      const userDataFromAuthMiddleware: User = req.user;
+      const isPasswordMatching: boolean = await compare(userDataFromReqBody.password, userDataFromAuthMiddleware.password);
+
+      if (isPasswordMatching) {
+        res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'validated old password' });
+      } else {
+        res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'wrong old password' });
+      }
     } catch (error) {
       next(error);
     }
@@ -79,28 +95,12 @@ class UsersController {
     }
   };
 
-  public checkOldPassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-    try {
-      const userDataFromReqBody: CreateUserDto = req.body;
-      const userDataFromAuthMiddleware: User = req.user;
-      const isPasswordMatching: boolean = await compare(userDataFromReqBody.password, userDataFromAuthMiddleware.password);
-
-      if (isPasswordMatching) {
-        res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'validated old password' });
-      } else {
-        res.status(200).json({ isPasswordMatching: isPasswordMatching, message: 'wrong old password' });
-      }
-    } catch (error) {
-      next(error);
-    }
-  };
-
   public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId: string = req.params.id;
       const deleteUserData: User = await this.userService.deleteUser(userId);
 
-      res.status(200).json({ data: deleteUserData, message: 'deleted' });
+      res.status(200).json({ data: deleteUserData, message: 'deleteUser Successful' });
     } catch (error) {
       next(error);
     }

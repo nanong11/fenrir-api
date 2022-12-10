@@ -1,4 +1,4 @@
-import { hash, compare } from 'bcrypt';
+import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { NODE_ENV, SECRET_KEY } from '@config';
 import { CreateUserDto } from '@dtos/users.dto';
@@ -10,21 +10,6 @@ import { isEmpty } from '@utils/util';
 
 class AuthService {
   public users = userModel;
-
-  public async signup(userData: CreateUserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
-
-    const findUserEmail: User = await this.users.findOne({ email: userData.email });
-    if (findUserEmail) throw new HttpException(409, `This email ${userData.email} already exists`);
-
-    const findUserMobile: User = await this.users.findOne({ mobile: userData.mobile });
-    if (findUserMobile) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
-
-    const hashedPassword = await hash(userData.password, 10);
-    const createUserData: User = await this.users.create({ ...userData, password: hashedPassword });
-
-    return createUserData;
-  }
 
   public async login(userData: CreateUserDto): Promise<{ cookie: string; token: string; findUser: User }> {
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');

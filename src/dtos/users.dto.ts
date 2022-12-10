@@ -1,14 +1,14 @@
 import { IsBoolean, IsEmail, IsNumber, IsObject, IsString } from 'class-validator';
 
 export class CreateUserDto {
+  @IsNumber()
+  public mobile: number;
+
   @IsEmail()
   public email: string;
 
   @IsString()
   public password: string;
-
-  @IsNumber()
-  public mobile: number;
 
   @IsString()
   public firstName: string;
@@ -16,30 +16,77 @@ export class CreateUserDto {
   @IsString()
   public lastName: string;
 
+  @IsString()
+  public birthday: string;
+
   @IsObject()
   public address: Object;
+
+  @IsBoolean()
+  public verifiedPhone: boolean;
+}
+
+export class UpdateUserDto {
+  @IsNumber()
+  public mobile: number;
+
+  @IsEmail()
+  public email: string;
+
+  @IsString()
+  public password: string;
+
+  @IsString()
+  public oldPassword: string;
+
+  @IsString()
+  public firstName: string;
+
+  @IsString()
+  public lastName: string;
 
   @IsString()
   public birthday: string;
 
-  @IsString()
-  public role: string;
+  @IsObject()
+  public address: Object;
 
   @IsBoolean()
   public isActive: boolean;
 
   @IsObject()
-  public socialMedia: object;
+  public socialMedia: Object;
 
   @IsObject()
-  public profilePic: object;
+  public profilePic: Object;
 
   @IsString()
   public about: string;
 
   @IsBoolean()
-  public verifiedPhone: boolean;
+  public verifiedUser: Object;
+}
 
-  @IsBoolean()
-  public verifiedUser: boolean;
+export class LoginUsersDto {
+  @IsString()
+  public email: string;
+
+  @IsString()
+  public password: string;
+
+  @IsNumber()
+  public mobile: number;
+}
+
+export class PasswordDto {
+  @IsString()
+  public password: string;
+}
+
+export class MoibileEmailDto {
+  @IsNumber()
+  public mobile: number;
+
+  @IsString()
+  public email: string;
 }
