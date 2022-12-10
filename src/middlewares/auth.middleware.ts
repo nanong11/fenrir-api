@@ -8,12 +8,12 @@ import userModel from '@models/users.model';
 const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     // Disable use of cookie but still set in
-    // const Authorization = req.cookies['Authorization'] || (req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null);
-    const Authorization = req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null;
+    const Authorization = req.cookies['Authorization'] || (req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null);
+    // const Authorization = req.header('Authorization') ? req.header('Authorization').split('Bearer ')[1] : null;
     // console.log('Authorization', Authorization);
     if (Authorization) {
       const secretKey: string = SECRET_KEY;
-      const verificationResponse = (await verify(Authorization, secretKey)) as DataStoredInToken;
+      const verificationResponse = verify(Authorization, secretKey) as DataStoredInToken;
       const userId = verificationResponse._id;
       const findUser = await userModel.findById(userId);
 

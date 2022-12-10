@@ -10,12 +10,7 @@ export interface User {
   role: string;
   isActive: boolean;
   socialMedia: object;
-  profilePic: {
-    id: string;
-    type: string;
-    status: string;
-    imageUrl: string;
-  };
+  profilePic: object;
   about: string;
   verifiedPhone: boolean;
   verifiedUser: boolean;
