@@ -68,7 +68,7 @@ class PostService {
       findPostCountOptions = { active: true };
     }
 
-    const postArr: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
+    const postArr: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(3);
     const postCount: number = await this.post.count(findPostCountOptions);
 
     const post: Post[] = [];
@@ -196,7 +196,7 @@ class PostService {
       };
     }
 
-    const postArr: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
+    const postArr: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(3);
     const postCount: number = await this.post.count(findPostCountOptions);
 
     const post: Post[] = [];
