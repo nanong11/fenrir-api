@@ -1,11 +1,11 @@
-import { IsArray, IsBoolean, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
   public userId: string;
 
-  @IsObject()
-  public user: object;
+  // @IsObject()
+  // public user: object;
 
   @IsString()
   public title: string;

@@ -16,7 +16,7 @@ class UserService {
   public async getUserById(userId: string): Promise<User> {
     if (isEmpty(userId)) throw new HttpException(400, 'UserId is empty');
 
-    const findUser: User = await this.users.findOne({ _id: userId });
+    const findUser: User = await this.users.findOne({ _id: userId, isActive: true });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;

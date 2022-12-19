@@ -3,9 +3,12 @@ import { HttpException } from '@exceptions/HttpException';
 import { Post, LoadPostData, SearchPostData } from '@/interfaces/post.interface';
 import postModel from '@/models/post.model';
 import { isEmpty } from '@utils/util';
+import { User } from '@/interfaces/users.interface';
+import userModel from '@models/users.model';
 
 class PostService {
   public post = postModel;
+  public users = userModel;
 
   public async createPost(postData: CreatePostDto): Promise<Post> {
     if (isEmpty(postData)) throw new HttpException(400, 'postData is empty');
@@ -65,10 +68,24 @@ class PostService {
       findPostCountOptions = { active: true };
     }
 
-    const post: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
+    const postArr: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
     const postCount: number = await this.post.count(findPostCountOptions);
 
-    return { post, postCount };
+    const post: Post[] = [];
+    if (postArr && postArr.length > 0) {
+      for (let i = 0; i < postArr.length; i++) {
+        const item: Post = postArr[i];
+        const findUser: User = await this.users.findOne({ _id: item.userId, isActive: true });
+
+        if (findUser) {
+          item.user = findUser;
+          post.push(item);
+        }
+      }
+      return { post, postCount };
+    } else {
+      return { post, postCount };
+    }
   }
 
   public async searchPost(searchPostDetails: SearchPostDto): Promise<SearchPostData> {
@@ -179,10 +196,24 @@ class PostService {
       };
     }
 
-    const post: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
+    const postArr: Post[] = await this.post.find(findPostOptions).sort({ createdAt: -1 }).limit(1);
     const postCount: number = await this.post.count(findPostCountOptions);
 
-    return { post, postCount };
+    const post: Post[] = [];
+    if (postArr && postArr.length > 0) {
+      for (let i = 0; i < postArr.length; i++) {
+        const item: Post = postArr[i];
+        const findUser: User = await this.users.findOne({ _id: item.userId, isActive: true });
+
+        if (findUser) {
+          item.user = findUser;
+          post.push(item);
+        }
+      }
+      return { post, postCount };
+    } else {
+      return { post, postCount };
+    }
   }
 
   public async deletePost(postId: string): Promise<Post> {
