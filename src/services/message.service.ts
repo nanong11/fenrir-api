@@ -3,9 +3,12 @@ import { isEmpty } from '@utils/util';
 import { Message } from '@interfaces/message.interface';
 import messageModel from '@/models/message.model';
 import { CreateMessageDto, UpdateMessageDto } from '@/dtos/message.dto';
+import { Conversation } from '@interfaces/conversation.interface';
+import ConversationService from '@/services/conversation.service';
 
 class MessageService {
   public message = messageModel;
+  public conversationService = new ConversationService();
 
   public async findAllMessage(): Promise<Message[]> {
     const allMessage: Message[] = await this.message.find();
@@ -21,9 +24,21 @@ class MessageService {
     return message;
   }
 
+  public async findAllMessageByConversationId(conversationId: string): Promise<Message[]> {
+    if (isEmpty(conversationId)) throw new HttpException(400, 'conversationId is empty');
+
+    const findAllMessageByConversationId: Message[] = await this.message.find({ conversationId: conversationId, isDeleted: false });
+    if (!findAllMessageByConversationId) throw new HttpException(409, 'findAllMessageByConversationId failed');
+
+    return findAllMessageByConversationId;
+  }
+
   public async createMessage(messageData: CreateMessageDto): Promise<Message> {
     if (isEmpty(messageData)) throw new HttpException(400, 'messageData is empty');
-
+    const findConversationById: Conversation = await this.conversationService.findConversationById(messageData.conversationId);
+    const participants: Array<String> = findConversationById.participants;
+    const isExist: boolean | String = participants.find(participant => participant === messageData.userId);
+    if (isEmpty(isExist)) throw new HttpException(400, 'user is not a participant of the conversation');
     const createMessage: Message = await this.message.create({ ...messageData });
 
     return createMessage;

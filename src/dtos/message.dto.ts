@@ -1,26 +1,20 @@
-import { IsArray, IsBoolean, IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 export class CreateMessageDto {
   @IsString()
-  public senderId: string;
+  public userId: string;
 
   @IsString()
-  public recipientId: string;
+  public conversationId: string;
 
   @IsString()
   public text: string;
 
   @IsArray()
-  public photos: Array<object>;
+  public media: Array<object>;
 }
 
 export class UpdateMessageDto {
   @IsString()
-  public text: string;
-
-  @IsArray()
-  public photos: Array<object>;
-
-  @IsBoolean()
-  public deleted: boolean;
+  public status: string;
 }

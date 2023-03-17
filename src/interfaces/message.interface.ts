@@ -1,8 +1,9 @@
 export interface Message {
   _id: string;
-  senderId: string;
-  recipientId: string;
+  userId: string;
+  conversationId: string;
   text: string;
-  photos: Array<object>;
-  deleted: boolean;
+  media: Array<object>;
+  status: string;
+  isDeleted: boolean;
 }

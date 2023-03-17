@@ -17,6 +17,12 @@ class MessageRoute implements Routes {
   private initializeRoutes() {
     this.router.get(`${this.path}`, authMiddleware, this.messageController.findAllMessage);
     this.router.get(`${this.path}/:messageId`, authMiddleware, validationMiddleware(String, 'params'), this.messageController.findMessageById);
+    this.router.get(
+      `${this.path}/find_by_conversation_id/:conversationId`,
+      authMiddleware,
+      validationMiddleware(String, 'params'),
+      this.messageController.findAllMessageByConversationId,
+    );
     this.router.post(`${this.path}/create`, authMiddleware, validationMiddleware(CreateMessageDto, 'body'), this.messageController.createMessage);
     this.router.put(
       `${this.path}/update/:messageId`,

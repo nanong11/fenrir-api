@@ -27,6 +27,17 @@ class MessageController {
     }
   };
 
+  public findAllMessageByConversationId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const conversationId: string = req.params.conversationId;
+      const findAllMessageByConversationId: Message[] = await this.messageService.findAllMessageByConversationId(conversationId);
+
+      res.status(200).json({ data: findAllMessageByConversationId, message: 'findAllMessageByConversationId' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const messageData: CreateMessageDto = req.body;

@@ -7,6 +7,7 @@ import TestDataRoute from '@routes/testData.route';
 import ProvinceRoute from '@routes/province.route';
 import PostRoute from '@routes/post.route';
 import MessageRoute from '@routes/message.route';
+import ConversationRoute from '@routes/conversation.route';
 
 validateEnv();
 
@@ -18,6 +19,7 @@ const app = new App([
   new ProvinceRoute(),
   new PostRoute(),
   new MessageRoute(),
+  new ConversationRoute(),
 ]);
 
 app.listen();

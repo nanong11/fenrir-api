@@ -3,11 +3,11 @@ import { Message } from '@interfaces/message.interface';
 
 const messageSchema: Schema = new Schema(
   {
-    senderId: {
+    userId: {
       type: String,
       required: true,
     },
-    recipientId: {
+    conversationId: {
       type: String,
       required: true,
     },
@@ -15,11 +15,15 @@ const messageSchema: Schema = new Schema(
       type: String,
       default: null,
     },
-    photos: {
+    media: {
       type: Array,
       default: null,
     },
-    deleted: {
+    status: {
+      type: String,
+      default: 'sent',
+    },
+    isDeleted: {
       type: Boolean,
       default: false,
     },
