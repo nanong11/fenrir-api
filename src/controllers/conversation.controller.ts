@@ -27,10 +27,21 @@ class ConversationController {
     }
   };
 
+  public findConversationByUserId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.params.userId;
+      const findConversationByUserId: Conversation[] = await this.conversationService.findConversationByUserId(userId);
+
+      res.status(200).json({ data: findConversationByUserId, message: 'findConversationByUserId' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createConversation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const conversationData: CreateConversationDto = req.body;
-      const createConversation: Conversation = await this.conversationService.createConversation(conversationData);
+      const createConversation = await this.conversationService.createConversation(conversationData);
 
       res.status(201).json({ data: createConversation, message: 'createConversation' });
     } catch (error) {

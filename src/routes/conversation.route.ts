@@ -22,6 +22,12 @@ class ConversationRoute implements Routes {
       validationMiddleware(String, 'params'),
       this.conversationController.findConversationById,
     );
+    this.router.get(
+      `${this.path}/find_conversation_by_userid/:userId`,
+      authMiddleware,
+      validationMiddleware(String, 'params'),
+      this.conversationController.findConversationByUserId,
+    );
     this.router.post(
       `${this.path}/create`,
       authMiddleware,

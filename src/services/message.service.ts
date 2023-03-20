@@ -27,6 +27,9 @@ class MessageService {
   public async findAllMessageByConversationId(conversationId: string): Promise<Message[]> {
     if (isEmpty(conversationId)) throw new HttpException(400, 'conversationId is empty');
 
+    const findConversationById: Conversation = await this.conversationService.findConversationById(conversationId);
+    if (isEmpty(findConversationById)) throw new HttpException(400, 'conversation not exist');
+
     const findAllMessageByConversationId: Message[] = await this.message.find({ conversationId: conversationId, isDeleted: false });
     if (!findAllMessageByConversationId) throw new HttpException(409, 'findAllMessageByConversationId failed');
 
@@ -35,13 +38,19 @@ class MessageService {
 
   public async createMessage(messageData: CreateMessageDto): Promise<Message> {
     if (isEmpty(messageData)) throw new HttpException(400, 'messageData is empty');
-    const findConversationById: Conversation = await this.conversationService.findConversationById(messageData.conversationId);
-    const participants: Array<String> = findConversationById.participants;
-    const isExist: boolean | String = participants.find(participant => participant === messageData.userId);
-    if (isEmpty(isExist)) throw new HttpException(400, 'user is not a participant of the conversation');
-    const createMessage: Message = await this.message.create({ ...messageData });
 
-    return createMessage;
+    const findConversationById: Conversation = await this.conversationService.findConversationById(messageData.conversationId);
+    if (!findConversationById) throw new HttpException(409, "conversation doesn't exist");
+
+    const participants: Array<any> = findConversationById.participants;
+    const isExist = participants.find(participant => participant.userId === messageData.userId);
+    if (isEmpty(isExist)) throw new HttpException(400, 'user is not a participant of the conversation');
+
+    const createMessage: Message = await this.message.create({ ...messageData });
+    if (isEmpty(createMessage)) throw new HttpException(400, 'create message failed');
+
+    const message: Message = await this.message.findOne({ _id: createMessage._id });
+    return message;
   }
 
   public async updateMessage(messageId: string, messageData: UpdateMessageDto): Promise<Message> {

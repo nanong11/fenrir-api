@@ -7,6 +7,14 @@ const conversationSchema: Schema = new Schema(
       type: Array,
       require: true,
     },
+    messages: {
+      type: Array,
+      default: [],
+    },
+    type: {
+      type: String,
+      require: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

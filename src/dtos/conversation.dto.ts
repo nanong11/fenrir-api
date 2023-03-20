@@ -1,8 +1,11 @@
-import { IsArray, IsBoolean } from 'class-validator';
+import { IsArray, IsBoolean, IsString } from 'class-validator';
 
 export class CreateConversationDto {
   @IsArray()
-  public participants: Array<String>;
+  public participants: Array<any>;
+
+  @IsString()
+  public type: string;
 }
 
 export class UpdateConversationDto {

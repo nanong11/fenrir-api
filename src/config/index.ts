@@ -5,6 +5,7 @@ export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const {
   NODE_ENV,
   PORT,
+  SOCKETIO_PORT,
   DB_HOST,
   DB_PORT,
   DB_DATABASE,
