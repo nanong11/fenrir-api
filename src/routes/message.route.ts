@@ -29,7 +29,7 @@ class MessageRoute implements Routes {
       authMiddleware,
       validationMiddleware(String, 'params'),
       validationMiddleware(UpdateMessageDto, 'body', true),
-      this.messageController.updateMessage,
+      this.messageController.updateMessageById,
     );
     this.router.delete(
       `${this.path}/delete/:messageId`,

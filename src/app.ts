@@ -110,7 +110,15 @@ class App {
       });
 
       socket.on('send_message', data => {
-        socket.to(data.data.conversationId).emit('receive_message', data);
+        socket.to(data.data.conversationId).emit('incoming_message', data);
+      });
+
+      socket.on('received_message', data => {
+        socket.to(data.conversationId).emit('notify_received_message', data);
+      });
+
+      socket.on('viewed_message', data => {
+        socket.to(data.conversationId).emit('notify_viewed_message', data);
       });
 
       socket.on('disconnect', () => {

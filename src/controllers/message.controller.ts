@@ -49,13 +49,13 @@ class MessageController {
     }
   };
 
-  public updateMessage = async (req: Request, res: Response, next: NextFunction) => {
+  public updateMessageById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const messageId: string = req.params.messageId;
       const messageData: UpdateMessageDto = req.body;
-      const updateMessage: Message = await this.messageService.updateMessage(messageId, messageData);
+      const updateMessageById: Message = await this.messageService.updateMessageById(messageId, messageData);
 
-      res.status(200).json({ data: updateMessage, message: 'updatedMessage' });
+      res.status(200).json({ data: updateMessageById, message: 'updateMessageById' });
     } catch (error) {
       next(error);
     }

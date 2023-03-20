@@ -53,12 +53,12 @@ class MessageService {
     return message;
   }
 
-  public async updateMessage(messageId: string, messageData: UpdateMessageDto): Promise<Message> {
+  public async updateMessageById(messageId: string, messageData: UpdateMessageDto): Promise<Message> {
     if (isEmpty(messageId)) throw new HttpException(400, 'messageId is empty');
     if (isEmpty(messageData)) throw new HttpException(400, 'messageData is empty');
 
     const updateMessageById: Message = await this.message.findByIdAndUpdate(messageId, messageData, { new: true });
-    if (!updateMessageById) throw new HttpException(409, "updateMessageById doesn't exist");
+    if (!updateMessageById) throw new HttpException(409, 'updateMessageById failed');
 
     return updateMessageById;
   }
