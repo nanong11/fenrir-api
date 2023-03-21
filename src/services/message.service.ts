@@ -39,12 +39,12 @@ class MessageService {
   public async createMessage(messageData: CreateMessageDto): Promise<Message> {
     if (isEmpty(messageData)) throw new HttpException(400, 'messageData is empty');
 
-    const findConversationById: Conversation = await this.conversationService.findConversationById(messageData.conversationId);
-    if (!findConversationById) throw new HttpException(409, "conversation doesn't exist");
+    // const findConversationById: Conversation = await this.conversationService.findConversationById(messageData.conversationId);
+    // if (!findConversationById) throw new HttpException(409, "conversation doesn't exist");
 
-    const participants: Array<any> = findConversationById.participants;
-    const isExist = participants.find(participant => participant.userId === messageData.userId);
-    if (isEmpty(isExist)) throw new HttpException(400, 'user is not a participant of the conversation');
+    // const participants: Array<any> = findConversationById.participants;
+    // const isExist = participants.find(participant => participant.userId === messageData.userId);
+    // if (isEmpty(isExist)) throw new HttpException(400, 'user is not a participant of the conversation');
 
     const createMessage: Message = await this.message.create({ ...messageData });
     if (isEmpty(createMessage)) throw new HttpException(400, 'create message failed');
