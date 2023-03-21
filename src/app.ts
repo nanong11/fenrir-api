@@ -117,8 +117,8 @@ class App {
         socket.to(data.conversationId).emit('notify_received_message', data);
       });
 
-      socket.on('viewed_message', data => {
-        socket.to(data.conversationId).emit('notify_viewed_message', data);
+      socket.on('seen_message', data => {
+        socket.to(data.conversationId).emit('notify_seen_message', data);
       });
 
       socket.on('disconnect', () => {
