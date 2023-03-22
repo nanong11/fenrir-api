@@ -61,7 +61,7 @@ class ConversationService {
       const conversationAlreadyExist: Conversation = conversationArray.find(conversation =>
         conversation.participants.find(participant => participant.userId === participantUserId_2),
       );
-      if (conversationAlreadyExist) throw new HttpException(400, 'conversationAlreadyExist');
+      if (conversationAlreadyExist) return conversationAlreadyExist;
 
       const participantsArray: Array<object> = [];
 
