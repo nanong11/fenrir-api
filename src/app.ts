@@ -105,20 +105,28 @@ class App {
     this.server.on('connection', socket => {
       console.log(`SocketId ${socket.id} connected`);
 
-      socket.on('join_conversation', data => {
-        socket.join(data._id);
+      socket.on('personal_room', userId => {
+        socket.join(userId);
       });
 
-      socket.on('send_message', data => {
-        socket.to(data.conversationId).emit('incoming_message', data);
+      socket.on('send_new_conversation', newConversation => {
+        socket.to(newConversation.participants[1].userId).emit('incoming_new_conversation', newConversation);
       });
 
-      socket.on('received_message', data => {
-        socket.to(data.conversationId).emit('notify_received_message', data);
+      socket.on('join_conversation', conversation => {
+        socket.join(conversation._id);
       });
 
-      socket.on('seen_message', data => {
-        socket.to(data.conversationId).emit('notify_seen_message', data);
+      socket.on('send_message', message => {
+        socket.to(message.conversationId).emit('incoming_message', message);
+      });
+
+      socket.on('received_message', message => {
+        socket.to(message.conversationId).emit('notify_received_message', message);
+      });
+
+      socket.on('seen_message', message => {
+        socket.to(message.conversationId).emit('notify_seen_message', message);
       });
 
       socket.on('disconnect', () => {
