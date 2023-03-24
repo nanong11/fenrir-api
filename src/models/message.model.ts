@@ -23,9 +23,9 @@ const messageSchema: Schema = new Schema(
       type: String,
       default: 'sent',
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
+    removed: {
+      type: Array,
+      default: [],
     },
   },
   { timestamps: true },

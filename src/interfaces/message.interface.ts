@@ -5,5 +5,5 @@ export interface Message {
   text: string;
   media: Array<object>;
   status: string;
-  isDeleted: boolean;
+  removed: Array<object>;
 }

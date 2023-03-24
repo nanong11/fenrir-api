@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 export class CreateMessageDto {
   @IsString()
@@ -24,6 +24,6 @@ export class UpdateMessageDto {
   @IsString()
   public status: string;
 
-  @IsBoolean()
-  public isDeleted: boolean;
+  @IsArray()
+  public removed: Array<object>;
 }
