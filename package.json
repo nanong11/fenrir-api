@@ -1,8 +1,8 @@
 {
-  "name": "anvari-api-test",
+  "name": "anvari-api",
   "version": "0.0.0",
   "description": "TypeScript + Mongoose + MongoDB + Express API Server",
-  "author": "",
+  "author": "nanongTech",
   "license": "ISC",
   "scripts": {
     "start": "npm run build && cross-env NODE_ENV=production node dist/server.js",
@@ -12,8 +12,10 @@
     "test": "jest --forceExit --detectOpenHandles",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "npm run lint -- --fix",
-    "deploy:prod": "npm run build && pm2 start ecosystem.config.js --only prod",
-    "deploy:dev": "pm2 start ecosystem.config.js --only dev"
+    "pm2:prod": "npm run build && pm2 start ecosystem.config.js --only prod",
+    "pm2:dev": "pm2 start ecosystem.config.js --only dev",
+    "pm2:list": "pm2 list",
+    "pm2:stop": "pm2 kill"
   },
   "dependencies": {
     "@swc/cli": "^0.1.57",
