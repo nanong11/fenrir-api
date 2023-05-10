@@ -3,12 +3,16 @@ import { User } from '@interfaces/users.interface';
 
 const userSchema: Schema = new Schema(
   {
-    mobile: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
+    // mobile: {
+    //   type: Number,
+    //   required: true,
+    //   unique: true,
+    // },
     email: {
+      type: String,
+      default: null,
+    },
+    username: {
       type: String,
       required: true,
       unique: true,
@@ -17,50 +21,54 @@ const userSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    firstName: {
+    name: {
       type: String,
       required: true,
     },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    birthday: {
-      type: String,
-      required: true,
-    },
-    address: {
-      type: Object,
-      required: true,
-    },
+    // firstName: {
+    //   type: String,
+    //   required: true,
+    // },
+    // lastName: {
+    //   type: String,
+    //   required: true,
+    // },
+    // birthday: {
+    //   type: String,
+    //   required: true,
+    // },
+    // address: {
+    //   type: Object,
+    //   required: true,
+    // },
     role: {
       type: String,
       default: 'user',
     },
-    verifiedPhone: {
-      type: Boolean,
-      required: true,
-    },
+    // verifiedPhone: {
+    //   type: Boolean,
+    //   required: true,
+    // },
     isActive: {
       type: Boolean,
       default: true,
     },
-    socialMedia: {
-      type: Object,
-      default: null,
-    },
+    // socialMedia: {
+    //   type: Object,
+    //   default: null,
+    // },
     profilePic: {
       type: Object,
       default: null,
     },
-    about: {
-      type: String,
-      default: null,
-    },
-    verifiedUser: {
-      type: Boolean,
-      default: false,
-    },
+    // about: {
+    //   type: String,
+    //   default: null,
+    // },
+    // verifiedUser: {
+    //   type: Boolean,
+    //   default: false,
+    // },
   },
   { timestamps: true },
 );

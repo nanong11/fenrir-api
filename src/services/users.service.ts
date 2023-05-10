@@ -8,10 +8,10 @@ import { isEmpty } from '@utils/util';
 class UserService {
   public users = userModel;
 
-  // public async findAllUser(): Promise<User[]> {
-  //   const users: User[] = await this.users.find();
-  //   return users;
-  // }
+  public async findAllUser(): Promise<User[]> {
+    const users: User[] = await this.users.find();
+    return users;
+  }
 
   public async getUserById(userId: string): Promise<User> {
     if (isEmpty(userId)) throw new HttpException(400, 'UserId is empty');
@@ -25,11 +25,11 @@ class UserService {
   public async createUser(userData: CreateUserDto): Promise<User> {
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
-    const findUserEmail: User = await this.users.findOne({ email: userData.email });
-    if (findUserEmail) throw new HttpException(409, `This email ${userData.email} already exists`);
+    const findUsername: User = await this.users.findOne({ username: userData.username });
+    if (findUsername) throw new HttpException(409, `This usename ${userData.username} already exists`);
 
-    const findUserMobile: User = await this.users.findOne({ mobile: userData.mobile });
-    if (findUserMobile) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
+    // const findUserMobile: User = await this.users.findOne({ mobile: userData.mobile });
+    // if (findUserMobile) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
     const createUserData: User = await this.users.create({ ...userData, password: hashedPassword });
@@ -48,15 +48,15 @@ class UserService {
       if (!isPasswordMatching) throw new HttpException(401, 'Wrong old password');
     }
 
-    if (userData.email) {
-      const findUser: User = await this.users.findOne({ email: userData.email });
-      if (findUser && findUser._id != userId) throw new HttpException(409, `This email ${userData.email} already exists`);
+    if (userData.username) {
+      const findUser: User = await this.users.findOne({ username: userData.username });
+      if (findUser && findUser._id != userId) throw new HttpException(409, `This username ${userData.username} already exists`);
     }
 
-    if (userData.mobile) {
-      const findUser: User = await this.users.findOne({ mobile: userData.mobile });
-      if (findUser && findUser._id != userId) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
-    }
+    // if (userData.mobile) {
+    //   const findUser: User = await this.users.findOne({ mobile: userData.mobile });
+    //   if (findUser && findUser._id != userId) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
+    // }
 
     if (userData.password) {
       const hashedPassword = await hash(userData.password, 10);
@@ -69,21 +69,21 @@ class UserService {
     return updateUserById;
   }
 
-  public async checkMobile(userMobile: number): Promise<Boolean> {
-    if (isEmpty(userMobile)) throw new HttpException(400, 'userMobile is empty');
+  // public async checkMobile(userMobile: number): Promise<Boolean> {
+  //   if (isEmpty(userMobile)) throw new HttpException(400, 'userMobile is empty');
 
-    const findUser: User = await this.users.findOne({ mobile: userMobile });
+  //   const findUser: User = await this.users.findOne({ mobile: userMobile });
 
-    return findUser?.mobile === userMobile ? true : false;
-  }
+  //   return findUser?.mobile === userMobile ? true : false;
+  // }
 
-  public async checkEmail(userEmail: string): Promise<Boolean> {
-    if (isEmpty(userEmail)) throw new HttpException(400, 'userEmail is empty');
+  // public async checkEmail(userEmail: string): Promise<Boolean> {
+  //   if (isEmpty(userEmail)) throw new HttpException(400, 'userEmail is empty');
 
-    const findUser: User = await this.users.findOne({ email: userEmail });
+  //   const findUser: User = await this.users.findOne({ email: userEmail });
 
-    return findUser?.email === userEmail ? true : false;
-  }
+  //   return findUser?.email === userEmail ? true : false;
+  // }
 
   public async deleteUser(userId: string): Promise<User> {
     const deleteUserById: User = await this.users.findByIdAndDelete(userId);

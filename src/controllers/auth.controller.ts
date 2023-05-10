@@ -36,7 +36,7 @@ class AuthController {
       const userData: User = req.user;
       const findUser: User = await this.authService.findUserData(userData);
 
-      res.status(200).json({ data: findUser, message: 'validated cookie' });
+      res.status(200).json({ data: findUser, message: 'validated user' });
     } catch (error) {
       next(error);
     }

@@ -20,7 +20,7 @@ describe('Testing Auth', () => {
         lastName: '',
         birthday: '',
         address: {},
-        verifiedPhone: false
+        verifiedPhone: false,
       };
 
       const authRoute = new AuthRoute();

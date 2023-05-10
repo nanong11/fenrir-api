@@ -8,15 +8,15 @@ import { compare } from 'bcrypt';
 class UsersController {
   public userService = new userService();
 
-  // public getUsers = async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //     const findAllUsersData: User[] = await this.userService.findAllUser();
+  public getUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const findAllUsersData: User[] = await this.userService.findAllUser();
 
-  //     res.status(200).json({ data: findAllUsersData, message: 'findAll' });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+      res.status(200).json({ data: findAllUsersData, message: 'findAll' });
+    } catch (error) {
+      next(error);
+    }
+  };
 
   public getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -68,32 +68,32 @@ class UsersController {
     }
   };
 
-  public checkMobileEmail = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userMobile: number = req.body.mobile;
-      const userEmail: string = req.body.email;
+  // public checkMobileEmail = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const userMobile: number = req.body.mobile;
+  //     const userEmail: string = req.body.email;
 
-      if (userMobile) {
-        const isMobileExist: Boolean = await this.userService.checkMobile(userMobile);
+  //     if (userMobile) {
+  //       const isMobileExist: Boolean = await this.userService.checkMobile(userMobile);
 
-        if (isMobileExist) {
-          res.status(200).json({ isMobileExist: isMobileExist, message: `${userMobile} exist in database.` });
-        } else {
-          res.status(200).json({ isMobileExist: isMobileExist, message: `${userMobile} not in database.` });
-        }
-      } else if (userEmail) {
-        const isEmailExist: Boolean = await this.userService.checkEmail(userEmail);
+  //       if (isMobileExist) {
+  //         res.status(200).json({ isMobileExist: isMobileExist, message: `${userMobile} exist in database.` });
+  //       } else {
+  //         res.status(200).json({ isMobileExist: isMobileExist, message: `${userMobile} not in database.` });
+  //       }
+  //     } else if (userEmail) {
+  //       const isEmailExist: Boolean = await this.userService.checkEmail(userEmail);
 
-        if (isEmailExist) {
-          res.status(200).json({ isEmailExist: isEmailExist, message: `${userEmail} exist in database.` });
-        } else {
-          res.status(200).json({ isEmailExist: isEmailExist, message: `${userEmail} not in database.` });
-        }
-      }
-    } catch (error) {
-      next(error);
-    }
-  };
+  //       if (isEmailExist) {
+  //         res.status(200).json({ isEmailExist: isEmailExist, message: `${userEmail} exist in database.` });
+  //       } else {
+  //         res.status(200).json({ isEmailExist: isEmailExist, message: `${userEmail} not in database.` });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
   public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import UsersController from '@controllers/users.controller';
-import { CreateUserDto, UpdateUserDto, PasswordDto, MoibileEmailDto } from '@dtos/users.dto';
+import { CreateUserDto, UpdateUserDto, PasswordDto } from '@dtos/users.dto';
 import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@middlewares/auth.middleware';
@@ -16,7 +16,7 @@ class UsersRoute implements Routes {
   }
 
   private initializeRoutes() {
-    // this.router.get(`${this.path}`, authMiddleware, this.usersController.getUsers);
+    this.router.get(`${this.path}`, authMiddleware, this.usersController.getUsers);
     this.router.get(`${this.path}/:id`, validationMiddleware(String, 'params'), this.usersController.getUserById);
     this.router.post(`${this.path}/create`, validationMiddleware(CreateUserDto, 'body'), this.usersController.createUser);
     this.router.put(
@@ -33,7 +33,7 @@ class UsersRoute implements Routes {
       validationMiddleware(PasswordDto, 'body'),
       this.usersController.checkOldPassword,
     );
-    this.router.post(`${this.path}/check_mobile_email`, validationMiddleware(MoibileEmailDto, 'body', true), this.usersController.checkMobileEmail);
+    // this.router.post(`${this.path}/check_mobile_email`, validationMiddleware(MoibileEmailDto, 'body', true), this.usersController.checkMobileEmail);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
   }
 }

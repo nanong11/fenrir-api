@@ -68,7 +68,7 @@ describe('Testing Users', () => {
         lastName: '',
         birthday: '',
         address: {},
-        verifiedPhone: false
+        verifiedPhone: false,
       };
 
       const usersRoute = new UsersRoute();
@@ -109,7 +109,7 @@ describe('Testing Users', () => {
         socialMedia: {},
         profilePic: {},
         about: '',
-        verifiedUser: false
+        verifiedUser: false,
       };
 
       const usersRoute = new UsersRoute();
