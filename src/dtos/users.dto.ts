@@ -4,8 +4,8 @@ export class CreateUserDto {
   // @IsNumber()
   // public mobile: number;
 
-  // @IsEmail()
-  // public email: string;
+  @IsEmail()
+  public email: string;
 
   @IsString()
   public username: string;
@@ -15,6 +15,9 @@ export class CreateUserDto {
 
   @IsString()
   public name: string;
+
+  @IsString()
+  public role: string;
 
   // @IsString()
   // public firstName: string;

@@ -26,7 +26,7 @@ class UserService {
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     const findUsername: User = await this.users.findOne({ username: userData.username });
-    if (findUsername) throw new HttpException(409, `This usename ${userData.username} already exists`);
+    if (findUsername) throw new HttpException(409, `${userData.username} already exists`);
 
     // const findUserMobile: User = await this.users.findOne({ mobile: userData.mobile });
     // if (findUserMobile) throw new HttpException(409, `This mobile ${userData.mobile} already exists`);
