@@ -17,6 +17,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import userService from '@services/users.service';
 import userModel from './models/users.model';
+import { User } from './interfaces/users.interface';
 
 class App {
   public app: express.Application;
@@ -109,19 +110,17 @@ class App {
     const users = {};
     this.server.on('connection', socket => {
       console.log(`SocketId ${socket.id} connected`);
+      console.log('SocketRooms', socket.rooms);
 
       socket.on('online', async userId => {
-        console.log(`${userId} is online`);
-        socket.join('online_users');
+        const updateUserById: User = await this.users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
+        if (updateUserById) {
+          socket.join('online_users');
+          users[socket.id] = userId;
+          socket.to('online_users').emit('incomming_user', updateUserById);
 
-        await this.users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
-
-        console.log('SocketRooms', socket.rooms);
-
-        users[socket.id] = userId;
-        console.log('users', users);
-
-        socket.to('online_users').emit('current_online_users', users);
+          console.log(`${userId} is online`);
+        }
       });
 
       socket.on('personal_room', userId => {
@@ -149,12 +148,14 @@ class App {
       });
 
       socket.on('disconnect', async () => {
-        console.log(`SocketId ${socket.id} disconnected`);
-        socket.leave('online_users');
-        await this.users.findByIdAndUpdate(users[socket.id], { isOnline: false }, { new: true });
-        delete users[socket.id];
-        console.log('users', users);
-        socket.to('online_users').emit('current_online_users', users);
+        const updateUserById: User = await this.users.findByIdAndUpdate(users[socket.id], { isOnline: false }, { new: true });
+        if (updateUserById) {
+          socket.leave('online_users');
+          delete users[socket.id];
+          socket.to('online_users').emit('incomming_user', updateUserById);
+
+          console.log(`SocketId ${socket.id} disconnected`);
+        }
       });
     });
   }
