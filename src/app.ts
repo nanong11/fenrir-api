@@ -15,6 +15,8 @@ import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 import { Server } from 'socket.io';
 import http from 'http';
+import userService from '@services/users.service';
+import userModel from './models/users.model';
 
 class App {
   public app: express.Application;
@@ -22,6 +24,8 @@ class App {
   public port: string | number;
   public socketioPort: number;
   public server: Server;
+  public userService = new userService();
+  public users = userModel;
 
   constructor(routes: Routes[]) {
     this.app = express();
@@ -102,8 +106,23 @@ class App {
   }
 
   private initializeSocketIo() {
+    const users = {};
     this.server.on('connection', socket => {
       console.log(`SocketId ${socket.id} connected`);
+
+      socket.on('online', async userId => {
+        console.log(`${userId} is online`);
+        socket.join('online_users');
+
+        await this.users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
+
+        console.log('SocketRooms', socket.rooms);
+
+        users[socket.id] = userId;
+        console.log('users', users);
+
+        socket.to('online_users').emit('current_online_users', users);
+      });
 
       socket.on('personal_room', userId => {
         socket.join(userId);
@@ -129,8 +148,13 @@ class App {
         socket.to(message.conversationId).emit('notify_seen_message', message);
       });
 
-      socket.on('disconnect', () => {
+      socket.on('disconnect', async () => {
         console.log(`SocketId ${socket.id} disconnected`);
+        socket.leave('online_users');
+        await this.users.findByIdAndUpdate(users[socket.id], { isOnline: false }, { new: true });
+        delete users[socket.id];
+        console.log('users', users);
+        socket.to('online_users').emit('current_online_users', users);
       });
     });
   }

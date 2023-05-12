@@ -13,6 +13,7 @@ export interface User {
   isActive: boolean;
   // socialMedia: object;
   profilePic: object;
+  isOnline: boolean;
   // about: string;
   // verifiedPhone: boolean;
   // verifiedUser: boolean;

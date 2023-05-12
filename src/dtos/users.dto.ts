@@ -69,6 +69,9 @@ export class UpdateUserDto {
   @IsBoolean()
   public isActive: boolean;
 
+  @IsBoolean()
+  public isOnline: boolean;
+
   @IsString()
   public role: string;
 

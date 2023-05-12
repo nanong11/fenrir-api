@@ -53,6 +53,10 @@ const userSchema: Schema = new Schema(
       type: Boolean,
       default: true,
     },
+    isOnline: {
+      type: Boolean,
+      default: false,
+    },
     // socialMedia: {
     //   type: Object,
     //   default: null,
