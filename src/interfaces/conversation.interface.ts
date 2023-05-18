@@ -6,5 +6,6 @@ export interface Conversation {
   participants: Array<any>;
   messages: Array<Message>;
   type: string;
+  createdBy: string;
   isActive: boolean;
 }

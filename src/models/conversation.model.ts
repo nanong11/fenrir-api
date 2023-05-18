@@ -19,6 +19,10 @@ const conversationSchema: Schema = new Schema(
       type: String,
       require: true,
     },
+    createdBy: {
+      type: String,
+      require: true,
+    },
     isActive: {
       type: Boolean,
       default: true,
