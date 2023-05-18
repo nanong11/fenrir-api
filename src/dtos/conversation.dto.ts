@@ -1,6 +1,9 @@
 import { IsArray, IsBoolean, IsString } from 'class-validator';
 
 export class CreateConversationDto {
+  @IsString()
+  public name: string;
+
   @IsArray()
   public participants: Array<any>;
 

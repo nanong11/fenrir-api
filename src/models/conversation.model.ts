@@ -3,6 +3,10 @@ import { Conversation } from '@interfaces/conversation.interface';
 
 const conversationSchema: Schema = new Schema(
   {
+    name: {
+      type: String,
+      require: true,
+    },
     participants: {
       type: Array,
       require: true,

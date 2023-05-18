@@ -3,7 +3,7 @@ import { isEmpty } from '@utils/util';
 import { Conversation } from '@interfaces/conversation.interface';
 import conversationModel from '@/models/conversation.model';
 import { CreateConversationDto, UpdateConversationDto } from '@/dtos/conversation.dto';
-import { User } from '@interfaces/users.interface';
+// import { User } from '@interfaces/users.interface';
 import userService from '@services/users.service';
 import { Message } from '@interfaces/message.interface';
 import messageModel from '@/models/message.model';
@@ -45,41 +45,35 @@ class ConversationService {
 
   public async createConversation(conversationData: CreateConversationDto): Promise<Conversation> {
     if (isEmpty(conversationData)) throw new HttpException(400, 'conversationData is empty');
-    if (conversationData.participants.length < 2) throw new HttpException(400, 'need 2 or more participants');
+    // if (conversationData.participants.length < 2) throw new HttpException(400, 'need 2 or more participants');
 
     // FOR CREATING CONVERSATION TYPE PM
     // MODIFY FOR CONVERSATION TYPE GROUP IN THE FUTURE
     if (conversationData.type === 'pm') {
-      const participantUserId_1: string = conversationData.participants[0];
-      const participantUserId_2: string = conversationData.participants[1];
-
-      const conversationArray: Conversation[] = await this.conversation.find({
-        participants: { $elemMatch: { userId: participantUserId_1 } },
-        isActive: true,
-      });
-
-      const conversationAlreadyExist: Conversation = conversationArray.find(conversation =>
-        conversation.participants.find(participant => participant.userId === participantUserId_2),
-      );
-      if (conversationAlreadyExist) return conversationAlreadyExist;
-
-      const participantsArray: Array<object> = [];
-
-      for (let i = 0; i < conversationData.participants.length; i++) {
-        const participantId = conversationData.participants[i];
-        const otherParticipantData: User = await this.userService.getUserById(participantId);
-        participantsArray.push({
-          userId: participantId,
-          firstName: otherParticipantData.firstName,
-          lastName: otherParticipantData.lastName,
-          profilePic: otherParticipantData.profilePic,
-        });
-      }
-
-      conversationData.participants = participantsArray;
-      const createConversation = await this.conversation.create({ ...conversationData });
-
-      return createConversation;
+      // const participantUserId_1: string = conversationData.participants[0];
+      // const participantUserId_2: string = conversationData.participants[1];
+      // const conversationArray: Conversation[] = await this.conversation.find({
+      //   participants: { $elemMatch: { userId: participantUserId_1 } },
+      //   isActive: true,
+      // });
+      // const conversationAlreadyExist: Conversation = conversationArray.find(conversation =>
+      //   conversation.participants.find(participant => participant.userId === participantUserId_2),
+      // );
+      // if (conversationAlreadyExist) return conversationAlreadyExist;
+      // const participantsArray: Array<object> = [];
+      // for (let i = 0; i < conversationData.participants.length; i++) {
+      //   const participantId = conversationData.participants[i];
+      //   const otherParticipantData: User = await this.userService.getUserById(participantId);
+      //   participantsArray.push({
+      //     userId: participantId,
+      //     firstName: otherParticipantData.firstName,
+      //     lastName: otherParticipantData.lastName,
+      //     profilePic: otherParticipantData.profilePic,
+      //   });
+      // }
+      // conversationData.participants = participantsArray;
+      // const createConversation = await this.conversation.create({ ...conversationData });
+      // return createConversation;
     } else {
       const createConversation: Conversation = await this.conversation.create({ ...conversationData });
       return createConversation;
