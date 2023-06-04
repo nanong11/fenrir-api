@@ -30,9 +30,49 @@ class ConversationService {
   public async findConversationByUserId(userId: string): Promise<Conversation[]> {
     if (isEmpty(userId)) throw new HttpException(400, 'userId is empty');
 
-    const conversationArray: Conversation[] = await this.conversation.find({ participants: { $elemMatch: { userId } }, isActive: true });
-    if (!conversationArray) throw new HttpException(409, 'conversation empty');
+    const conversationArray: Conversation[] = await this.conversation.find({
+      participants: { $elemMatch: { participantId: userId } },
+      isActive: true,
+    });
+    if (!conversationArray) throw new HttpException(409, 'finding conversation failed');
 
+    // FOR GETTING PARTICIPANTS DATA
+    if (conversationArray.length > 0) {
+      for (let i = 0; i < conversationArray.length; i++) {
+        const conversation = conversationArray[i];
+        const participantsArray = conversation.participants;
+
+        const participantIdArray = [];
+        for (let i = 0; i < participantsArray.length; i++) {
+          const element = participantsArray[i];
+          participantIdArray.push(element.participantId);
+        }
+        const participantDataArray: User[] = await this.userService.getAllUserById(participantIdArray);
+
+        const newParticipantsArray = [];
+        for (let i = 0; i < participantDataArray.length; i++) {
+          const participant = participantDataArray[i];
+          const isExist = participantsArray.find(element => element.participantId === participant._id.toString());
+          newParticipantsArray.push({
+            _id: participant._id,
+            email: participant.email,
+            username: participant.username,
+            name: participant.name,
+            role: participant.role,
+            isActive: participant.isActive,
+            profilePic: participant.profilePic,
+            isOnline: participant.isOnline,
+            addedBy: isExist.addedBy,
+            addedOn: isExist.addedOn,
+          });
+        }
+
+        // console.log('newParticipantsArray', newParticipantsArray)
+        conversation.participants = newParticipantsArray;
+      }
+    }
+
+    // FOR GETTING MESSAGES
     // for (let i = 0; i < conversationArray.length; i++) {
     //   const conversation: Conversation = conversationArray[i];
     //   const findAllMessageByConversationId: Message[] = await this.message.find({ conversationId: conversation._id, isDeleted: false });
@@ -79,21 +119,39 @@ class ConversationService {
       const findConversationByName: Conversation = await this.conversation.findOne({ name: conversationData.name });
       if (findConversationByName) throw new HttpException(400, 'conversation name already exist');
 
-      const participantsArray: Array<object> = [];
+      const newParticipantsArray: Array<object> = [];
       for (let i = 0; i < conversationData.participants.length; i++) {
         const participantId = conversationData.participants[i];
-        const participantData: User = await this.userService.getUserById(participantId);
-        participantsArray.push({
-          userId: participantId,
-          name: participantData.name,
-          profilePic: participantData.profilePic,
+        newParticipantsArray.push({
+          participantId,
           addedBy: participantId,
           addedOn: new Date(),
         });
       }
+      conversationData.participants = newParticipantsArray;
 
-      conversationData.participants = participantsArray;
       const createConversation: Conversation = await this.conversation.create({ ...conversationData });
+      if (!createConversation) throw new HttpException(400, 'creating conversation failed');
+
+      const participantsArray: Array<object> = [];
+      for (let i = 0; i < createConversation.participants.length; i++) {
+        const participant = createConversation.participants[i];
+        const participantData: User = await this.userService.getUserById(participant.participantId);
+        participantsArray.push({
+          _id: participantData._id,
+          email: participantData.email,
+          username: participantData.username,
+          name: participantData.name,
+          role: participantData.role,
+          isActive: participantData.isActive,
+          profilePic: participantData.profilePic,
+          isOnline: participantData.isOnline,
+          addedBy: participant.addedBy,
+          addedOn: participant.addedOn,
+        });
+      }
+      createConversation.participants = participantsArray;
+
       return createConversation;
     }
   }
@@ -119,23 +177,22 @@ class ConversationService {
       for (let i = 0; i < conversationData.participants.length; i++) {
         const participantId = conversationData.participants[i];
 
-        const userData: User = await this.userService.getUserById(participantId);
-        if (isEmpty(userData)) throw new HttpException(400, 'user not exist');
-
-        const isExist = findConversationById.participants.find(participant => participant.userId === participantId);
+        const isExist = findConversationById.participants.find(participant => {
+          if (participant.participantId === participantId) {
+            return participant;
+          }
+        });
 
         if (!isExist) {
-          const newParticipantData = {
-            userId: participantId,
-            name: userData.name,
-            profilePic: userData.profilePic,
+          const newParticipantsData = {
+            participantId,
             addedBy: conversationData.addedBy,
             addedOn: new Date(),
           };
 
           const updateConversation: Conversation = await this.conversation.findByIdAndUpdate(
             conversationId,
-            { $push: { participants: newParticipantData } },
+            { $push: { participants: newParticipantsData } },
             { new: true },
           );
           if (!updateConversation) throw new HttpException(409, 'updateConversation failed');
@@ -143,6 +200,25 @@ class ConversationService {
       }
 
       const updatedConversation: Conversation = await this.conversation.findOne({ _id: conversationId });
+      const participantsArray: Array<object> = [];
+      for (let i = 0; i < updatedConversation.participants.length; i++) {
+        const participant = updatedConversation.participants[i];
+        const participantData: User = await this.userService.getUserById(participant.participantId);
+        participantsArray.push({
+          _id: participantData._id,
+          email: participantData.email,
+          username: participantData.username,
+          name: participantData.name,
+          role: participantData.role,
+          isActive: participantData.isActive,
+          profilePic: participantData.profilePic,
+          isOnline: participantData.isOnline,
+          addedBy: participant.addedBy,
+          addedOn: participant.addedOn,
+        });
+      }
+      updatedConversation.participants = participantsArray;
+
       return updatedConversation;
     } else {
       throw new HttpException(400, 'no participants to add');

@@ -118,7 +118,6 @@ class App {
           socket.join('online_users');
           users[socket.id] = userId;
           socket.to('online_users').emit('incomming_user', updateUserById);
-
           console.log(`${userId} is online`);
         }
       });
@@ -127,12 +126,25 @@ class App {
         socket.join(userId);
       });
 
-      socket.on('send_new_conversation', newConversation => {
-        socket.to(newConversation.participants[1].userId).emit('incoming_new_conversation', newConversation);
-      });
-
       socket.on('join_conversation', conversation => {
         socket.join(conversation._id);
+      });
+
+      socket.on('added_participant', addParticipantsData => {
+        console.log('CHECK_addParticipantsData', addParticipantsData);
+        const conversation = addParticipantsData.conversation;
+        socket.to(conversation._id).emit('new_participant_added', conversation);
+
+        const newParticipantArray = addParticipantsData.newPaticipantsArr;
+        for (let i = 0; i < newParticipantArray.length; i++) {
+          const participantId = newParticipantArray[i];
+          console.log('CHECK_participant', participantId);
+          socket.to(participantId).emit('added_in_conversation', conversation);
+        }
+      });
+
+      socket.on('send_new_conversation', newConversation => {
+        socket.to(newConversation.participants[1].userId).emit('incoming_new_conversation', newConversation);
       });
 
       socket.on('send_message', message => {

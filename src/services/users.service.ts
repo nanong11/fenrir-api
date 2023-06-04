@@ -16,10 +16,19 @@ class UserService {
   public async getUserById(userId: string): Promise<User> {
     if (isEmpty(userId)) throw new HttpException(400, 'UserId is empty');
 
-    const findUser: User = await this.users.findOne({ _id: userId, isActive: true });
+    const findUser: User = await this.users.findOne({ _id: userId, isActive: true }, { password: 0 });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;
+  }
+
+  public async getAllUserById(userIdArray: Array<any>): Promise<User[]> {
+    if (isEmpty(userIdArray)) throw new HttpException(400, 'UserId is empty');
+
+    const findUserArray: User[] = await this.users.find({ _id: { $in: userIdArray }, isActive: true }, { password: 0 });
+    if (!findUserArray) throw new HttpException(409, "User doesn't exist");
+
+    return findUserArray;
   }
 
   public async createUser(userData: CreateUserDto): Promise<User> {
