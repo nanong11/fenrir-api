@@ -43,16 +43,20 @@ class ConversationService {
         const participantsArray = conversation.participants;
 
         const participantIdArray = [];
+        const addedByIdArray = [];
         for (let i = 0; i < participantsArray.length; i++) {
           const element = participantsArray[i];
           participantIdArray.push(element.participantId);
+          addedByIdArray.push(element.addedBy);
         }
         const participantDataArray: User[] = await this.userService.getAllUserById(participantIdArray);
+        const addedByDataArray: User[] = await this.userService.getAllUserById(participantIdArray);
 
         const newParticipantsArray = [];
         for (let i = 0; i < participantDataArray.length; i++) {
           const participant = participantDataArray[i];
           const isExist = participantsArray.find(element => element.participantId === participant._id.toString());
+          const addedByData = addedByDataArray.find(e => e._id.toString() === isExist.addedBy);
           newParticipantsArray.push({
             _id: participant._id,
             email: participant.email,
@@ -62,7 +66,7 @@ class ConversationService {
             isActive: participant.isActive,
             profilePic: participant.profilePic,
             isOnline: participant.isOnline,
-            addedBy: isExist.addedBy,
+            addedBy: addedByData,
             addedOn: isExist.addedOn,
           });
         }
@@ -137,6 +141,7 @@ class ConversationService {
       for (let i = 0; i < createConversation.participants.length; i++) {
         const participant = createConversation.participants[i];
         const participantData: User = await this.userService.getUserById(participant.participantId);
+        const addedByData: User = await this.userService.getUserById(participant.addedBy);
         participantsArray.push({
           _id: participantData._id,
           email: participantData.email,
@@ -146,7 +151,7 @@ class ConversationService {
           isActive: participantData.isActive,
           profilePic: participantData.profilePic,
           isOnline: participantData.isOnline,
-          addedBy: participant.addedBy,
+          addedBy: addedByData,
           addedOn: participant.addedOn,
         });
       }
@@ -200,10 +205,11 @@ class ConversationService {
       }
 
       const updatedConversation: Conversation = await this.conversation.findOne({ _id: conversationId });
-      const participantsArray: Array<object> = [];
+      const participantsArray = [];
       for (let i = 0; i < updatedConversation.participants.length; i++) {
         const participant = updatedConversation.participants[i];
         const participantData: User = await this.userService.getUserById(participant.participantId);
+        const addedByData: User = await this.userService.getUserById(participant.addedBy);
         participantsArray.push({
           _id: participantData._id,
           email: participantData.email,
@@ -213,7 +219,7 @@ class ConversationService {
           isActive: participantData.isActive,
           profilePic: participantData.profilePic,
           isOnline: participantData.isOnline,
-          addedBy: participant.addedBy,
+          addedBy: addedByData,
           addedOn: participant.addedOn,
         });
       }
