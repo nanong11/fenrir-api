@@ -131,15 +131,24 @@ class App {
       });
 
       socket.on('added_participant', addParticipantsData => {
-        console.log('CHECK_addParticipantsData', addParticipantsData);
         const conversation = addParticipantsData.conversation;
         socket.to(conversation._id).emit('new_participant_added', conversation);
 
         const newParticipantArray = addParticipantsData.newPaticipantsArr;
         for (let i = 0; i < newParticipantArray.length; i++) {
           const participantId = newParticipantArray[i];
-          console.log('CHECK_participant', participantId);
           socket.to(participantId).emit('added_in_conversation', conversation);
+        }
+      });
+
+      socket.on('removed_participant', removeParticipantsData => {
+        const conversation = removeParticipantsData.conversation;
+        socket.to(conversation._id).emit('participant_removed', conversation);
+
+        const removedPaticipantsArr = removeParticipantsData.removedPaticipantsArr;
+        for (let i = 0; i < removedPaticipantsArr.length; i++) {
+          const participantId = removedPaticipantsArr[i];
+          socket.to(participantId).emit('removed_in_conversation', conversation);
         }
       });
 

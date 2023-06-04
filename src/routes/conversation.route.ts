@@ -48,6 +48,13 @@ class ConversationRoute implements Routes {
       validationMiddleware(UpdateConversationDto, 'body', true),
       this.conversationController.addParticipant,
     );
+    this.router.put(
+      `${this.path}/remove_participant/:conversationId`,
+      authMiddleware,
+      validationMiddleware(String, 'params'),
+      validationMiddleware(UpdateConversationDto, 'body', true),
+      this.conversationController.removeParticipant,
+    );
     this.router.delete(
       `${this.path}/delete/:conversationId`,
       validationMiddleware(String, 'params'),

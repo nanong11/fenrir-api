@@ -73,6 +73,18 @@ class ConversationController {
     }
   };
 
+  public removeParticipant = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const conversationId: string = req.params.conversationId;
+      const conversationData: UpdateConversationDto = req.body;
+      const updateConversation: Conversation = await this.conversationService.removeParticipant(conversationId, conversationData);
+
+      res.status(200).json({ data: updateConversation, message: 'removeParticipant' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public deleteConversation = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const conversationId: string = req.params.conversationId;

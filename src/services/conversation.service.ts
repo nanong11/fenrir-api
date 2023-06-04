@@ -176,21 +176,23 @@ class ConversationService {
     if (isEmpty(conversationData)) throw new HttpException(400, 'conversationData is empty');
 
     const findConversationById: Conversation = await this.conversation.findOne({ _id: conversationId });
-    if (isEmpty(findConversationById)) throw new HttpException(400, 'conversationData not exist');
+    if (!findConversationById) throw new HttpException(400, 'conversationData not exist');
 
     if (conversationData.participants.length > 0) {
-      for (let i = 0; i < conversationData.participants.length; i++) {
-        const participantId = conversationData.participants[i];
+      const participantDataArray: User[] = await this.userService.getAllUserById(conversationData.participants);
+
+      for (let i = 0; i < participantDataArray.length; i++) {
+        const element = participantDataArray[i];
 
         const isExist = findConversationById.participants.find(participant => {
-          if (participant.participantId === participantId) {
+          if (participant.participantId === element._id.toString()) {
             return participant;
           }
         });
 
         if (!isExist) {
           const newParticipantsData = {
-            participantId,
+            participantId: element._id.toString(),
             addedBy: conversationData.addedBy,
             addedOn: new Date(),
           };
@@ -205,11 +207,22 @@ class ConversationService {
       }
 
       const updatedConversation: Conversation = await this.conversation.findOne({ _id: conversationId });
+
+      const updatedConParticipantIdArr = [];
+      const addedByIdArray = [];
+      for (let i = 0; i < updatedConversation.participants.length; i++) {
+        const participant = updatedConversation.participants[i];
+        updatedConParticipantIdArr.push(participant.participantId);
+        addedByIdArray.push(participant.addedBy);
+      }
+      const updatedConParticipantDataArray: User[] = await this.userService.getAllUserById(updatedConParticipantIdArr);
+      const addedByDataArr: User[] = await this.userService.getAllUserById(addedByIdArray);
+
       const participantsArray = [];
       for (let i = 0; i < updatedConversation.participants.length; i++) {
         const participant = updatedConversation.participants[i];
-        const participantData: User = await this.userService.getUserById(participant.participantId);
-        const addedByData: User = await this.userService.getUserById(participant.addedBy);
+        const participantData = updatedConParticipantDataArray.find(e => e._id.toString() === participant.participantId);
+        const addedByData = addedByDataArr.find(e => e._id.toString() === participant.addedBy);
         participantsArray.push({
           _id: participantData._id,
           email: participantData.email,
@@ -228,6 +241,70 @@ class ConversationService {
       return updatedConversation;
     } else {
       throw new HttpException(400, 'no participants to add');
+    }
+  }
+
+  public async removeParticipant(conversationId: string, conversationData: UpdateConversationDto): Promise<Conversation> {
+    if (isEmpty(conversationId)) throw new HttpException(400, 'conversationId is empty');
+    if (isEmpty(conversationData)) throw new HttpException(400, 'conversationData is empty');
+
+    const findConversationById: Conversation = await this.conversation.findOne({ _id: conversationId });
+    if (!findConversationById) throw new HttpException(400, 'conversationData not exist');
+
+    if (conversationData.participants.length > 0) {
+      for (let i = 0; i < conversationData.participants.length; i++) {
+        const participantId = conversationData.participants[i];
+        const isExist = findConversationById.participants.find(participant => {
+          if (participant.participantId === participantId) {
+            return participant;
+          }
+        });
+
+        if (isExist) {
+          const updateConversation: Conversation = await this.conversation.findByIdAndUpdate(
+            conversationId,
+            { $pull: { participants: { participantId: isExist.participantId } } },
+            { new: true },
+          );
+          if (!updateConversation) throw new HttpException(409, 'updateConversation failed');
+        }
+      }
+
+      const updatedConversation: Conversation = await this.conversation.findOne({ _id: conversationId });
+
+      const updatedConParticipantIdArr = [];
+      const addedByIdArray = [];
+      for (let i = 0; i < updatedConversation.participants.length; i++) {
+        const participant = updatedConversation.participants[i];
+        updatedConParticipantIdArr.push(participant.participantId);
+        addedByIdArray.push(participant.addedBy);
+      }
+      const updatedConParticipantDataArray: User[] = await this.userService.getAllUserById(updatedConParticipantIdArr);
+      const addedByDataArr: User[] = await this.userService.getAllUserById(addedByIdArray);
+
+      const participantsArray = [];
+      for (let i = 0; i < updatedConversation.participants.length; i++) {
+        const participant = updatedConversation.participants[i];
+        const participantData = updatedConParticipantDataArray.find(e => e._id.toString() === participant.participantId);
+        const addedByData = addedByDataArr.find(e => e._id.toString() === participant.addedBy);
+        participantsArray.push({
+          _id: participantData._id,
+          email: participantData.email,
+          username: participantData.username,
+          name: participantData.name,
+          role: participantData.role,
+          isActive: participantData.isActive,
+          profilePic: participantData.profilePic,
+          isOnline: participantData.isOnline,
+          addedBy: addedByData,
+          addedOn: participant.addedOn,
+        });
+      }
+      updatedConversation.participants = participantsArray;
+
+      return updatedConversation;
+    } else {
+      throw new HttpException(400, 'no participants to remove');
     }
   }
 
