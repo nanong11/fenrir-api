@@ -24,6 +24,9 @@ export class UpdateConversationDto {
   @IsString()
   public addedBy: string;
 
+  @IsString()
+  public deletedBy: string;
+
   @IsArray()
   public participants: Array<any>;
 

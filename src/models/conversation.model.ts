@@ -23,6 +23,10 @@ const conversationSchema: Schema = new Schema(
       type: String,
       require: true,
     },
+    deletedBy: {
+      type: String,
+      default: null,
+    },
     isActive: {
       type: Boolean,
       default: true,

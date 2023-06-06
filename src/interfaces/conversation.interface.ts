@@ -7,5 +7,6 @@ export interface Conversation {
   messages: Array<Message>;
   type: string;
   createdBy: string;
+  deletedBy: string;
   isActive: boolean;
 }
