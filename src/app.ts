@@ -127,7 +127,13 @@ class App {
       });
 
       socket.on('join_conversation', conversation => {
+        console.log(`SocketId ${socket.id} joined ${conversation._id}`);
         socket.join(conversation._id);
+      });
+
+      socket.on('leave_conversation', conversation => {
+        console.log(`SocketId ${socket.id} leaved ${conversation._id}`);
+        socket.leave(conversation._id);
       });
 
       socket.on('added_participant', addParticipantsData => {
@@ -150,6 +156,10 @@ class App {
           const participantId = removedPaticipantsArr[i];
           socket.to(participantId).emit('removed_in_conversation', conversation);
         }
+      });
+
+      socket.on('deleted_conversation', deletedConversation => {
+        socket.to(deletedConversation._id).emit('conversation_deleted', deletedConversation);
       });
 
       socket.on('send_new_conversation', newConversation => {
