@@ -23,9 +23,13 @@ const messageSchema: Schema = new Schema(
       type: String,
       default: 'sent',
     },
-    removed: {
-      type: Array,
-      default: [],
+    removedFor: {
+      type: String,
+      default: null,
+    },
+    removedBy: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true },

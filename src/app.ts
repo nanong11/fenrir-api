@@ -127,12 +127,12 @@ class App {
       });
 
       socket.on('join_conversation', conversation => {
-        console.log(`SocketId ${socket.id} joined ${conversation._id}`);
+        console.log(`SocketId ${users[socket.id]} joined ${conversation.name}`);
         socket.join(conversation._id);
       });
 
       socket.on('leave_conversation', conversation => {
-        console.log(`SocketId ${socket.id} leaved ${conversation._id}`);
+        console.log(`SocketId ${users[socket.id]} leaved ${conversation.name}`);
         socket.leave(conversation._id);
       });
 
